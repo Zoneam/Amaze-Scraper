@@ -14,31 +14,50 @@ let urls = [];
 const fetchPage = async (url) => {
     try {
         const response = await axios(url)
-        return (response.data ? response.data : '' );
+        console.log(response.status)
+        if (response.status){
+            return response.data ;
+        }
+        
     } catch (err){
-        console.log(url," ----err\n", err)
+       //console.log(url," ----err\n", err)
     }
 };
 
-const getPrices = async (urls) => {
-for (const url of urls){
+const getPrices = async (url)=>{
     console.log('-----------------------------------------------')
-        const response = await fetchPage(url)
-        const productPage = response ? response : '';
-        let $ = cheerio.load(productPage);
-         if ($("#priceblock_ourprice", productPage).text()) {
-          price =
-            "ourprice: => " + $("#priceblock_ourprice", productPage).text();
-        }
-         else if ($("#priceblock_dealprice", productPage).text()) {
-          price =
-            "dealerprice: => " + $("#priceblock_dealprice", productPage).text();
-        } else if ($("#priceblock_saleprice", productPage).text()) {
-          price =
-            "saleprice: => " + $("#priceblock_saleprice", productPage).text();
-        }
-       console.log(price + "    " + url);
+    const response = await fetchPage(url)
+    const productPage = response ? response : '';
+    if (productPage){
+    let $ = cheerio.load(productPage);
+     if ($("#priceblock_ourprice", productPage).text()) {
+      price =
+        "ourprice: => " + $("#priceblock_ourprice", productPage).text();
     }
+     else if ($("#priceblock_dealprice", productPage).text()) {
+      price =
+        "dealerprice: => " + $("#priceblock_dealprice", productPage).text();
+    } else if ($("#priceblock_saleprice", productPage).text()) {
+      price =
+        "saleprice: => " + $("#priceblock_saleprice", productPage).text();
+    }
+  console.log(price + "    " + url);
+    } else {
+        console.log('No Product Found !')
+    }
+}
+
+const getPricesDelay = async (urls) => {
+    const timer = ms => new Promise(res => setTimeout(res, ms))
+    async function load () { 
+        for (const url of urls){
+        getPrices(url)
+        await timer(10000); 
+      }
+    }
+
+    load()
+    
 }
 
     
@@ -60,7 +79,7 @@ axios(searchPage).then(response =>{
         console.log(i + ": " + homeUrl + tailLink);
       }
         })
-    }).then(() => getPrices(urls))
+    }).then(() => getPricesDelay(urls))
 
 
 
