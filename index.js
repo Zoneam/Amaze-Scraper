@@ -2,15 +2,12 @@ const PORT = 8000;
 const cheerio = require("cheerio");
 const express = require("express");
 const axios = require("axios");
-const { forEach } = require("axios/lib/utils");
-const { response } = require("express");
 const homeUrl = "https://www.amazon.com";
 const searchPage = "https://www.amazon.com/s?k=drill&ref=nb_sb_noss_2";
 const app = express();
 
 let urls = [];
-const finalResults = []
-;
+const finalResults = [];
 
 const fetchPage = async (url) => {
     try {
@@ -18,14 +15,12 @@ const fetchPage = async (url) => {
         console.log(response.status)
         if (response.status){
             return response.data ;
-        }
-        
+        }  
     } catch (err){
         if (err.response){
             if (err.response.status === 503) {
             console.log(url)
         }}
-       
     }
 };
 
@@ -44,7 +39,9 @@ const getPrices = async (url)=>{
             console.log(couponAmount[0])
             isCouponAvailable = true;
             console.log(isCouponAvailable)
-        } 
+        } else {
+            couponAmount = ''
+        }
         if ($("#priceblock_ourprice", productPage).text()) {
             price = $("#priceblock_ourprice", productPage).text();
             priceFrom = 'Our Price';
