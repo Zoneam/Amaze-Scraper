@@ -5,11 +5,12 @@ const axios = require("axios");
 const { forEach } = require("axios/lib/utils");
 const { response } = require("express");
 const homeUrl = "https://www.amazon.com";
-const searchPage = "https://www.amazon.com/s?k=screwdriver&ref=nb_sb_noss";
+const searchPage = "https://www.amazon.com/s?k=drill&ref=nb_sb_noss_2";
 const app = express();
-let price;
-let urls = [];
 
+let urls = [];
+const finalResults = []
+;
 
 const fetchPage = async (url) => {
     try {
@@ -20,30 +21,54 @@ const fetchPage = async (url) => {
         }
         
     } catch (err){
-       //console.log(url," ----err\n", err)
+        if (err.response){
+            if (err.response.status === 503) {
+            console.log(url)
+        }}
+       
     }
 };
 
 const getPrices = async (url)=>{
+    let price;
+    let priceFrom;
+    let couponAmount = '';
+    let isCouponAvailable = false;
     console.log('-----------------------------------------------')
     const response = await fetchPage(url)
     const productPage = response ? response : '';
     if (productPage){
     let $ = cheerio.load(productPage);
-     if ($("#priceblock_ourprice", productPage).text()) {
-      price =
-        "ourprice: => " + $("#priceblock_ourprice", productPage).text();
-    }
-     else if ($("#priceblock_dealprice", productPage).text()) {
-      price =
-        "dealerprice: => " + $("#priceblock_dealprice", productPage).text();
-    } else if ($("#priceblock_saleprice", productPage).text()) {
-      price =
-        "saleprice: => " + $("#priceblock_saleprice", productPage).text();
-    }
-  console.log(price + "    " + url);
+        if ($('.couponBadge',productPage).text() === 'Coupon') {
+            couponAmount = $('span:contains("Save an extra")', productPage).text().substr(15, 8).trim().split(' ');
+            console.log(couponAmount[0])
+            isCouponAvailable = true;
+            console.log(isCouponAvailable)
+        } 
+        if ($("#priceblock_ourprice", productPage).text()) {
+            price = $("#priceblock_ourprice", productPage).text();
+            priceFrom = 'Our Price';
+        } else if ($("#priceblock_dealprice", productPage).text()) {
+            price = $("#priceblock_dealprice", productPage).text();
+            priceFrom = 'Dealer Price';
+        } else if ($("#priceblock_saleprice", productPage).text()) {
+            price = $("#priceblock_saleprice", productPage).text();
+            priceFrom = 'Sale Price';
+        } else {
+            return; // if price unavailable return
+        }
+  console.log(price + "    " + url + "\n " + isCouponAvailable);
+  finalResults.push({
+      pricefrom: priceFrom,
+      price: price,
+      link: url,
+      coupon: isCouponAvailable,
+      couponAmount: couponAmount[0]?couponAmount[0]:'',
+})
     } else {
-        console.log('No Product Found !')
+        console.log('Product Not Found !')
+        urls.push(url);
+        console.log(urls.length)
     }
 }
 
@@ -51,22 +76,13 @@ const getPricesDelay = async (urls) => {
     const timer = ms => new Promise(res => setTimeout(res, ms))
     async function load () { 
         for (const url of urls){
+        await timer(100); // delay miliseconds before each fetch
         getPrices(url)
-        await timer(10000); 
       }
+      console.log(finalResults,finalResults.length)
     }
-
     load()
-    
 }
-
-    
-
-
-    
-
-
-
 
 axios(searchPage).then(response =>{
     let $ = cheerio.load(response.data)
@@ -76,13 +92,10 @@ axios(searchPage).then(response =>{
         .attr("href");
     if (tailLink) {
         urls.push(homeUrl + tailLink);
-        console.log(i + ": " + homeUrl + tailLink);
+       // console.log(i + ": " + homeUrl + tailLink);
       }
         })
     }).then(() => getPricesDelay(urls))
-
-
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
