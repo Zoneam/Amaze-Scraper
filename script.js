@@ -6,7 +6,6 @@ searchButton.addEventListener("click", async (e) => {
 
   fetch(`http://localhost:8000/${searchInput}`, {
     method: "GET",
-    // mode: "no-cors",
     headers: {
       Accept: "application/json",
     },

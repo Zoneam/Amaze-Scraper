@@ -4,16 +4,19 @@ const express = require("express");
 const path = require("path");
 const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
-var cors = require("cors");
+const cors = require("cors");
 const app = express();
 app.use(cors());
-let urls = [];
-const finalResults = [];
 
+// ENDPOINT
 app.get("/:searchInput", async (req, res) => {
+  let urls = [];
+  let finalResults = [];
+  // FETCH SINGLE PAGE -------------------
   const fetchPage = async (url) => {
     try {
       const response = await axios(url);
+      console.log("----------------------");
       console.log(response.status);
       if (response.status) {
         return response.data;
@@ -21,12 +24,15 @@ app.get("/:searchInput", async (req, res) => {
     } catch (err) {
       if (err.response) {
         if (err.response.status === 503) {
-          console.log(url);
+          console.log("----------------------");
+          console.log(err.response.status + " Error");
         }
       }
     }
   };
+  //----------------------------------------
 
+  // GET PRICE DATA FROM SINGLE ITEM
   const getPrices = async (url) => {
     let price;
     let priceFrom;
@@ -68,26 +74,29 @@ app.get("/:searchInput", async (req, res) => {
         coupon: isCouponAvailable,
         couponAmount: couponAmount[0] ? couponAmount[0] : "",
       });
+      urls = urls.filter((u) => u !== url);
+      console.log(urls.length);
     } else {
       console.log("Product Not Found !");
       urls.push(url);
       console.log(urls.length);
     }
   };
-
+  //----------------------------------------
+  //  DELAY AND FETCH SINGLE ITEM ---------
   const getPricesDelay = async (urls) => {
-    const timer = (ms) => new Promise((res) => setTimeout(res, ms));
     async function load() {
       for (const url of urls) {
-        await timer(100); // delay miliseconds before each fetch
-        getPrices(url);
+        await getPrices(url);
       }
     }
+
     await load();
     console.log(finalResults, finalResults.length);
     res.send(finalResults);
   };
-
+  //----------------------------------------
+  // STARTING POINT AND FETCH ALL URLS -----
   function start(input) {
     const searchPage = `https://www.amazon.com/s?k=${input}&ref=nb_sb_noss_2`;
     axios(searchPage)
@@ -104,10 +113,9 @@ app.get("/:searchInput", async (req, res) => {
       })
       .then(() => getPricesDelay(urls));
   }
-
   start(req.params.searchInput);
 });
-
+// LISTENING FOR THE PORT -----
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
 });
