@@ -35,16 +35,18 @@ app.get("/:searchInput", async (req, res) => {
 
   // GET PRICE DATA FROM SINGLE ITEM
   const getPrices = async (url) => {
-    index += 1;
-    console.log("----" + index + "----");
+    index += 1; //for testing
+    console.log("----" + index + "----"); //for testing
     let price;
     let priceFrom;
+    let img;
+    let title;
     let couponAmount = "";
     let isCouponAvailable = false;
     const response = await fetchPage(url);
     const productPage = response ? response : "";
     if (productPage) {
-      let $ = cheerio.load(productPage);
+      let $ = cheerio.load(productPage); // LOADING HTML INTO CHEERIO
       if ($(".couponBadge", productPage).text() === "Coupon") {
         couponAmount = $('span:contains("Save an extra")', productPage)
           .text()
@@ -56,6 +58,12 @@ app.get("/:searchInput", async (req, res) => {
         console.log(isCouponAvailable);
       } else {
         couponAmount = "";
+      }
+      if ($("#productTitle", productPage).text() !== "") {
+        title = $("#productTitle", productPage).text();
+      }
+      if ($("#landingImage", productPage).attr("src") !== "") {
+        img = $("#landingImage", productPage).attr("src");
       }
       if ($("#priceblock_ourprice", productPage).text()) {
         price = $("#priceblock_ourprice", productPage).text();
@@ -71,14 +79,17 @@ app.get("/:searchInput", async (req, res) => {
       }
       console.log(price + "    " + url + "\n " + isCouponAvailable);
       finalResults.push({
+        title: title.trim(),
         pricefrom: priceFrom,
         price: price,
         link: url,
+        img: img,
         coupon: isCouponAvailable,
         couponAmount: couponAmount[0] ? couponAmount[0] : "",
       });
       //urls = urls.filter((u) => u !== url);
       console.log(urls.length);
+      console.log(title.trim());
     } else {
       console.log("Product Not Found !");
       urls.push(url);
