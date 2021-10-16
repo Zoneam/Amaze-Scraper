@@ -22,7 +22,7 @@ app.get("/:searchInput", async (req, res) => {
     console.log("----------------------");
     console.log(response.status, url);
     if (response.status) {
-        //return response.data;
+        return response.data;
       }
     } catch (err) {
       if (err.response) {

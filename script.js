@@ -11,7 +11,7 @@ searchButton.addEventListener("click", async (e) => {
     },
   })
     .then((response) => {
-      console.log("LOGING")
+      console.log(response)
       response.json()
     })
     .then((result) => {
