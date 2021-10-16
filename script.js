@@ -10,7 +10,10 @@ searchButton.addEventListener("click", async (e) => {
       Accept: "application/json",
     },
   })
-    .then((response) => response.json())
+    .then((response) => {
+      console.log("LOGING")
+      response.json()
+    })
     .then((result) => {
       console.log(result);
       $(document).ready(function () {
