@@ -4,16 +4,13 @@ searchButton.addEventListener("click", async (e) => {
   e.preventDefault();
   const searchInput = document.getElementById("searchInput").value.trim();
 
-  fetch(`/${searchInput}`, {
+  fetch(`http://localhost:8000/${searchInput}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
     },
   })
-    .then((response) => {
-      console.log(response)
-      response.json()
-    })
+    .then((response) => response.json())
     .then((result) => {
       console.log(result);
       $(document).ready(function () {
