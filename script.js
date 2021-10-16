@@ -4,7 +4,7 @@ searchButton.addEventListener("click", async (e) => {
   e.preventDefault();
   const searchInput = document.getElementById("searchInput").value.trim();
 
-  fetch(`/${searchInput}`, {
+  fetch(`/:${searchInput}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
