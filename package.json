@@ -3,8 +3,7 @@
     "axios": "^0.22.0",
     "cheerio": "^1.0.0-rc.10",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "main": "server.js"
+    "express": "^4.17.1"
   },
   "scripts": {
     "start": "server.js"
