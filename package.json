@@ -4,11 +4,11 @@
     "cheerio": "^1.0.0-rc.10",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "http-delayed-response": "0.0.4",
+    "main": "server.js",
     "nodemon": "^2.0.13"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "server.js"
   }
-
 }
-

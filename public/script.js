@@ -32,6 +32,7 @@ searchButton.addEventListener("click", async (e) => {
                 ${result[i].couponAmount?`<large class="bg-success text-white p-2 bg-opacity-75">${result[i].couponAmount} off</large>`:''}
               </div>
             </div>
+
           </div>
         </div>`;
         $("#cards").html(cards);
