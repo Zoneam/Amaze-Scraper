@@ -6,7 +6,6 @@ searchButton.addEventListener("click", async (e) => {
 
   fetch(`http://localhost:8000/${searchInput}`, {
     method: "GET",
-    // mode: "no-cors",
     headers: {
       Accept: "application/json",
     },
@@ -16,3 +15,9 @@ searchButton.addEventListener("click", async (e) => {
       console.log("parsed json", result);
     });
 });
+
+return fetch("/website/MyJsonFile.json")
+  .then((response) => response.json())
+  .then((responseJson) => {
+    return responseJson;
+  });
