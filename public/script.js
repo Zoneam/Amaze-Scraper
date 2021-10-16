@@ -4,7 +4,7 @@ searchButton.addEventListener("click", async (e) => {
   e.preventDefault();
   const searchInput = document.getElementById("searchInput").value.trim();
 
-  fetch(`http://localhost:8000/${searchInput}`, {
+  fetch(`/api/${searchInput}`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -32,7 +32,6 @@ searchButton.addEventListener("click", async (e) => {
                 ${result[i].couponAmount?`<large class="bg-success text-white p-2 bg-opacity-75">${result[i].couponAmount} off</large>`:''}
               </div>
             </div>
-
           </div>
         </div>`;
         $("#cards").html(cards);

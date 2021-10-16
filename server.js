@@ -9,9 +9,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "/")));
+app.use(express.static(path.join(__dirname, "/public")));
 // ENDPOINT
-app.get("/:searchInput", async (req, res) => {
+app.get("/api/:searchInput", async (req, res) => {
   let index = 0;
   let urls = [];
   let finalResults = [];
@@ -132,5 +132,5 @@ app.get("/:searchInput", async (req, res) => {
 });
 // LISTENING FOR THE PORT -----
 app.listen(PORT, () => {
-  console.log(`Example app listening at http://localhost:${PORT}`);
+  console.log(`App listening at http://localhost:${PORT}`);
 });
