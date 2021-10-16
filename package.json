@@ -4,7 +4,7 @@
     "cheerio": "^1.0.0-rc.10",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "main": "server.js",
+    "main": "server.js"
  
   },
   "scripts": {
