@@ -18,11 +18,11 @@ app.get("/:searchInput", async (req, res) => {
   // FETCH SINGLE PAGE -------------------
   const fetchPage = async (url) => {
     try {
-    const response = await axios(url);
-    console.log("----------------------");
-    console.log(response.status, url);
-    if (response.status) {
-        //return response.data;
+      const response = await axios(url);
+      console.log("----------------------");
+      console.log(response.status, url);
+      if (response.status) {
+        return response.data;
       }
     } catch (err) {
       if (err.response) {
@@ -89,6 +89,7 @@ app.get("/:searchInput", async (req, res) => {
         coupon: isCouponAvailable,
         couponAmount: couponAmount[0] ? couponAmount[0] : "",
       });
+      //urls = urls.filter((u) => u !== url);
       console.log(urls.length);
       console.log(title.trim());
     } else {
