@@ -7,7 +7,9 @@ const homeUrl = "https://www.amazon.com";
 const cors = require("cors");
 const app = express();
 app.use(cors());
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "/")));
 // ENDPOINT
 app.get("/:searchInput", async (req, res) => {
   let index = 0;
