@@ -15,3 +15,9 @@ searchButton.addEventListener("click", async (e) => {
       console.log("parsed json", result);
     });
 });
+
+return fetch("/website/MyJsonFile.json")
+  .then((response) => response.json())
+  .then((responseJson) => {
+    return responseJson;
+  });

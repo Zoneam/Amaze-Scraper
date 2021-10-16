@@ -10,6 +10,7 @@ app.use(cors());
 
 // ENDPOINT
 app.get("/:searchInput", async (req, res) => {
+  let index = 0;
   let urls = [];
   let finalResults = [];
   // FETCH SINGLE PAGE -------------------
@@ -17,7 +18,7 @@ app.get("/:searchInput", async (req, res) => {
     try {
       const response = await axios(url);
       console.log("----------------------");
-      console.log(response.status);
+      console.log(response.status, url);
       if (response.status) {
         return response.data;
       }
@@ -34,6 +35,8 @@ app.get("/:searchInput", async (req, res) => {
 
   // GET PRICE DATA FROM SINGLE ITEM
   const getPrices = async (url) => {
+    index += 1;
+    console.log("----" + index + "----");
     let price;
     let priceFrom;
     let couponAmount = "";
@@ -74,7 +77,7 @@ app.get("/:searchInput", async (req, res) => {
         coupon: isCouponAvailable,
         couponAmount: couponAmount[0] ? couponAmount[0] : "",
       });
-      urls = urls.filter((u) => u !== url);
+      //urls = urls.filter((u) => u !== url);
       console.log(urls.length);
     } else {
       console.log("Product Not Found !");
