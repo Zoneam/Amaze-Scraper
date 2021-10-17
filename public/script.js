@@ -19,7 +19,7 @@ searchButton.addEventListener("click", async (e) => {
           cards += `<div class="col">
           <div class="card shadow-lg">
             <a href='${result[i].link}'>
-             <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>${result[i].pricefrom}  ${result[i].price}</text></img>
+             <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Price: ${result[i].priceWhole + result[i].priceFraction}</text></img>
             </a>
             <div class="card-body">
             <a href='${result[i].link}'>
@@ -29,7 +29,7 @@ searchButton.addEventListener("click", async (e) => {
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.open('${result[i].link}','_blank')">Buy Now</button>
                 </div>
-                ${result[i].couponAmount?`<large class="bg-success text-white p-2 bg-opacity-75">${result[i].couponAmount} off</large>`:''}
+                ${result[i].couponAmount?`<large class="bg-success text-white p-2 bg-opacity-75">${result[i].couponAmount}</large>`:''}
               </div>
             </div>
 
