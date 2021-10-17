@@ -132,5 +132,5 @@ app.get("/api/:searchInput", async (req, res) => {
 });
 // LISTENING FOR THE PORT -----
 app.listen(PORT, () => {
-  console.log(`App listening at http://localhost:${PORT}`);
+  //console.log(`App listening at http://localhost:${PORT}`);
 });
