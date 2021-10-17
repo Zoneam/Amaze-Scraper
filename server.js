@@ -28,7 +28,7 @@ app.get("/api/:searchInput", async (req, res) => {
           isCouponAvailable = false;
           if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') {
             couponAmount = $(this).find('.s-coupon-highlight-color').text()
-            console.log(couponAmount);
+           // console.log(couponAmount);
             isCouponAvailable = true;
           } else {
             couponAmount = "";
