@@ -12,13 +12,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 // ENDPOINT
 app.get("/api/:searchInput", async (req, res) => {
-  let url;
+  let url = '';
   let finalResults = [];
-  let priceWhole;
-  let priceFraction;
-  let img;
-  let title;
-  let couponAmount = "";
+  let priceWhole ='';
+  let priceFraction = '';
+  let img = '';
+  let title = '';
+  let couponAmount = '';
   let isCouponAvailable = false;
 
     axios(`https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`)
@@ -28,7 +28,6 @@ app.get("/api/:searchInput", async (req, res) => {
           isCouponAvailable = false;
           if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') {
             couponAmount = $(this).find('.s-coupon-highlight-color').text()
-            //console.log(couponAmount);
             isCouponAvailable = true;
           } else {
             couponAmount = "";
@@ -57,8 +56,7 @@ app.get("/api/:searchInput", async (req, res) => {
                 });
         });
       })
-      .then(async () => {
-        //console.log(finalResults)
+      .then( () => {
         res.send(finalResults);
       });
   
