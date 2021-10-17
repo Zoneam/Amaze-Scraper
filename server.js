@@ -57,7 +57,7 @@ app.get("/api/:searchInput", async (req, res) => {
           .split(" ");
         //console.log(couponAmount[0]);
         isCouponAvailable = true;
-        console.log(isCouponAvailable);
+        //console.log(isCouponAvailable);
       } else {
         couponAmount = "";
       }
