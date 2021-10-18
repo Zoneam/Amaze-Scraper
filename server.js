@@ -50,7 +50,7 @@ app.get("/api/:searchInput", async (req, res) => {
                   priceWhole: priceWhole,
                   priceFraction: priceFraction,
                   link: homeUrl + url,
-                  img: img,
+                  img: "",
                   coupon: isCouponAvailable,
                   couponAmount: couponAmount ? couponAmount : "",
                 });
