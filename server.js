@@ -77,7 +77,7 @@ app.get("/api/:searchInput", async (req, res) => {
         });
       })
       .then( () => {
-        res.send(finalResults);
+       // res.send(finalResults);
       });
   
 });
