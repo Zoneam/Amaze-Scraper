@@ -23,6 +23,26 @@ app.get("/api/:searchInput", async (req, res) => {
  
     axios(`https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`)
       .then((response) => {
+        res.send([
+          {
+            title: 'Bluetooth Speaker,MusiBaby Speaker,Outdoor, Portable,Waterproof,Wireless Speakers,Dual Pairing, Bluetooth 5.0,Loud Stereo,Booming Bass,1500 Mins Playtime for Home&Party Black',
+            priceWhole: '26.',
+            priceFraction: '93',
+            link: 'https://www.amazon.com/Bluetooth-Speakers-MusiBaby-Portable-Waterproof/dp/B07XVFB67J/ref=sr_1_13?dchild=1&keywords=speaker&qid=1634430211&sr=8-13',
+            img: 'https://m.media-amazon.com/images/I/713Nb6CHS-L._AC_UY218_.jpg',
+            coupon: true,
+            couponAmount: 'Save 5%'
+          },
+          {
+            title: 'JBL Flip 4 Waterproof Portable Bluetooth Speaker - Blue',
+            priceWhole: '116.',
+            priceFraction: '95',
+            link: 'https://www.amazon.com/JBL-Bluetooth-Portable-Stereo-Speaker/dp/B01N0QHI8L/ref=sr_1_14?dchild=1&keywords=speaker&qid=1634430211&sr=8-14',
+            img: 'https://m.media-amazon.com/images/I/71WS9WIUDKL._AC_UY218_.jpg',
+            coupon: false,
+            couponAmount: ''
+          }
+        ])
         let $ = cheerio.load(response.data);
         $(".s-asin", response.data).each(function (i) {
           isCouponAvailable = false;
@@ -50,14 +70,14 @@ app.get("/api/:searchInput", async (req, res) => {
                   priceWhole: priceWhole,
                   priceFraction: priceFraction,
                   link: homeUrl + url,
-                  img: "",
+                  img: img,
                   coupon: isCouponAvailable,
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });
       })
       .then( () => {
-        res.json(finalResults);
+        res.send(finalResults);
       });
   
 });
