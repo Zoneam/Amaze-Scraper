@@ -66,7 +66,7 @@ app.get("/api/:searchInput", async (req, res) => {
         });                                                         
    res.send(finalResults);
     } catch (err) {
-   res.send(err)
+   //res.send(err)
     }
 });
 // LISTENING FOR THE PORT -----
