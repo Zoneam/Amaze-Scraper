@@ -5,9 +5,7 @@ const path = require("path");
 const axios = require("axios");
 const { TIMEOUT } = require("dns");
 const homeUrl = "https://www.amazon.com";
-// const cors = require("cors");
 const app = express();
-// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
@@ -21,9 +19,9 @@ app.get("/api/:searchInput", async (req, res) => {
   let title = '';
   let couponAmount = '';
   let isCouponAvailable = false;
-  let response;
+
   try {
-      response = await axios({
+      const response = await axios({
         method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
         timeout: 5000,
@@ -36,9 +34,11 @@ app.get("/api/:searchInput", async (req, res) => {
           "referer": "https://www.amazon.com/"
         }
       });
+    
   const body = await response.data;
-        let $ = cheerio.load(body);
-        $(".s-asin", response.data).each(function (i) {
+        let $ = cheerio.load(body); // Loading response from page to cheerio
+    $(".s-asin", response.data).each(function (i) {
+          // Finding Coupon 
           isCouponAvailable = false;
           if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') {
             couponAmount = $(this).find('.s-coupon-highlight-color').text()
@@ -46,19 +46,24 @@ app.get("/api/:searchInput", async (req, res) => {
           } else {
             couponAmount = "";
           }
+          // Finding Product title
           if ($(this).find('span' + '.a-text-normal').text() !== "") {
             title = $(this).find('span' + '.a-text-normal').text();
           }
+          // Finding Product image
           if ($(this).find('img' + '.s-image').attr("src") !== "") {
             img = $(this).find('img' + '.s-image').attr("src");
           }
+          // Finding Product price
           if ($(this).find('span' + '.a-price-whole').text() !== '') {
             priceWhole = $(this).find('span' + '.a-price-whole').text();
             priceFraction = $(this).find('span' + '.a-price-fraction').text();
           }
+          // Finding Product url
           if ($(this).find('a' + '.a-link-normal').attr('href') !== '') {
             url = $(this).find('a' + '.a-link-normal').attr('href');
           }
+          // pushing info for each product into our array of object
           finalResults.push({
                   title: title.trim(),
                   priceWhole: priceWhole,
@@ -69,12 +74,12 @@ app.get("/api/:searchInput", async (req, res) => {
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });                                                         
-   res.send(finalResults);
+   res.send(finalResults);  // Sending responce
     } catch (err) {
    res.send(err)
     }
 });
-// LISTENING FOR THE PORT -----
+
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
 });
