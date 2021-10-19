@@ -25,8 +25,17 @@ app.get("/api/:searchInput", async (req, res) => {
   try {
     do {
       response = await axios({
+        method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
-        timeout: 5000
+        timeout: 5000,
+        headers: {
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+          "Accept-Encoding": "gzip, deflate, br",
+          "accept-language": "en-US,en;q=0.9,ko;q=0.8",
+          "cache-control": "no-cache",
+          "pragma": "no-cache",
+          "referer": "https://www.amazon.com/"
+        }
       });
     } while (
       response.status !== 200
@@ -66,7 +75,7 @@ app.get("/api/:searchInput", async (req, res) => {
         });                                                         
    res.send(finalResults);
     } catch (err) {
-   //res.send(err)
+   res.send(err)
     }
 });
 // LISTENING FOR THE PORT -----
