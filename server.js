@@ -23,7 +23,6 @@ app.get("/api/:searchInput", async (req, res) => {
   let isCouponAvailable = false;
   let response;
   try {
-    do {
       response = await axios({
         method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
@@ -37,9 +36,6 @@ app.get("/api/:searchInput", async (req, res) => {
           "referer": "https://www.amazon.com/"
         }
       });
-    } while (
-      response.status !== 200
-    )
   const body = await response.data;
         let $ = cheerio.load(body);
         $(".s-asin", response.data).each(function (i) {
