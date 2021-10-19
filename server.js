@@ -3,6 +3,7 @@ const cheerio = require("cheerio");
 const express = require("express");
 const path = require("path");
 const axios = require("axios");
+const { TIMEOUT } = require("dns");
 const homeUrl = "https://www.amazon.com";
 // const cors = require("cors");
 const app = express();
@@ -20,8 +21,12 @@ app.get("/api/:searchInput", async (req, res) => {
   let title = '';
   let couponAmount = '';
   let isCouponAvailable = false;
- try {
-  const response = await axios(`https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`);
+  try {
+    const response = await axios({
+      url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
+      TIMEOUT: 5000
+    });
+  console.log(response.ok) 
   const body = await response.data;
         let $ = cheerio.load(body);
         $(".s-asin", response.data).each(function (i) {
@@ -58,9 +63,7 @@ app.get("/api/:searchInput", async (req, res) => {
    res.send(finalResults);
     } catch (err) {
    res.send(err)
-   
     }
-
 });
 // LISTENING FOR THE PORT -----
 app.listen(PORT, () => {
