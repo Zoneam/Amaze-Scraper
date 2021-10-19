@@ -4,7 +4,6 @@ const express = require("express");
 const path = require("path");
 const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
-// const fetch = require('node-fetch');
 // const cors = require("cors");
 const app = express();
 // app.use(cors());
@@ -22,8 +21,8 @@ app.get("/api/:searchInput", async (req, res) => {
   let couponAmount = '';
   let isCouponAvailable = false;
  try {
-  const response = await fetch(`https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`);
-  const body = await response.text();
+  const response = await axios(`https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`);
+  const body = await response.data;
         let $ = cheerio.load(body);
         $(".s-asin", response.data).each(function (i) {
           isCouponAvailable = false;
@@ -55,10 +54,11 @@ app.get("/api/:searchInput", async (req, res) => {
                   coupon: isCouponAvailable,
                   couponAmount: couponAmount ? couponAmount : "",
                 });
-        });
+        });                                                         
    res.send(finalResults);
     } catch (err) {
    res.send(err)
+   
     }
 
 });
