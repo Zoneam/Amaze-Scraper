@@ -4,6 +4,7 @@ const express = require("express");
 const path = require("path");
 const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
+const fetch = require('node-fetch');
 // const cors = require("cors");
 const app = express();
 // app.use(cors());
@@ -20,30 +21,10 @@ app.get("/api/:searchInput", async (req, res) => {
   let title = '';
   let couponAmount = '';
   let isCouponAvailable = false;
- 
-    axios(`https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`)
-      .then((response) => {
-        res.send([
-          {
-            title: 'Bluetooth Speaker,MusiBaby Speaker,Outdoor, Portable,Waterproof,Wireless Speakers,Dual Pairing, Bluetooth 5.0,Loud Stereo,Booming Bass,1500 Mins Playtime for Home&Party Black',
-            priceWhole: '26.',
-            priceFraction: '93',
-            link: 'https://www.amazon.com/Bluetooth-Speakers-MusiBaby-Portable-Waterproof/dp/B07XVFB67J/ref=sr_1_13?dchild=1&keywords=speaker&qid=1634430211&sr=8-13',
-            img: 'https://m.media-amazon.com/images/I/713Nb6CHS-L._AC_UY218_.jpg',
-            coupon: true,
-            couponAmount: 'Save 5%'
-          },
-          {
-            title: 'JBL Flip 4 Waterproof Portable Bluetooth Speaker - Blue',
-            priceWhole: '116.',
-            priceFraction: '95',
-            link: 'https://www.amazon.com/JBL-Bluetooth-Portable-Stereo-Speaker/dp/B01N0QHI8L/ref=sr_1_14?dchild=1&keywords=speaker&qid=1634430211&sr=8-14',
-            img: 'https://m.media-amazon.com/images/I/71WS9WIUDKL._AC_UY218_.jpg',
-            coupon: false,
-            couponAmount: ''
-          }
-        ])
-        let $ = cheerio.load(response.data);
+ try {
+  const response = await fetch(`https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`);
+  const body = await response.text();
+        let $ = cheerio.load(body);
         $(".s-asin", response.data).each(function (i) {
           isCouponAvailable = false;
           if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') {
@@ -75,11 +56,11 @@ app.get("/api/:searchInput", async (req, res) => {
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });
-      })
-      .then( () => {
-       // res.send(finalResults);
-      });
-  
+   res.send(finalResults);
+    } catch (err) {
+   res.send(err)
+    }
+
 });
 // LISTENING FOR THE PORT -----
 app.listen(PORT, () => {
