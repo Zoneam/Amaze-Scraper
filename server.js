@@ -3,132 +3,76 @@ const cheerio = require("cheerio");
 const express = require("express");
 const path = require("path");
 const axios = require("axios");
+const { TIMEOUT } = require("dns");
 const homeUrl = "https://www.amazon.com";
-const cors = require("cors");
+// const cors = require("cors");
 const app = express();
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 // ENDPOINT
 app.get("/api/:searchInput", async (req, res) => {
-  let index = 0;
-  let urls = [];
+  let url = '';
   let finalResults = [];
-  // FETCH SINGLE PAGE -------------------
-  const fetchPage = async (url) => {
-    try {
-    const response = await axios(url);
-    console.log("----------------------");
-    console.log(response.status, url);
-    if (response.status) {
-        return response.data;
-      }
-    } catch (err) {
-      if (err.response) {
-        if (err.response.status === 503) {
-          console.log("----------------------");
-          console.log(err.response.status + " Error");
+  let priceWhole ='';
+  let priceFraction = '';
+  let img = '';
+  let title = '';
+  let couponAmount = '';
+  let isCouponAvailable = false;
+  let response;
+  try {
+      response = await axios({
+        method: 'GET',
+        url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
+        timeout: 5000,
+        headers: {
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+          "Accept-Encoding": "gzip, deflate, br",
+          "accept-language": "en-US,en;q=0.9,ko;q=0.8",
+          "cache-control": "no-cache",
+          "pragma": "no-cache",
+          "referer": "https://www.amazon.com/"
         }
-      }
-    }
-  };
-  //----------------------------------------
-
-  // GET PRICE DATA FROM SINGLE ITEM
-  const getPrices = async (url) => {
-    index += 1; //for testing
-    console.log("----" + index + "----"); //for testing
-    let price;
-    let priceFrom;
-    let img;
-    let title;
-    let couponAmount = "";
-    let isCouponAvailable = false;
-    const response = await fetchPage(url);
-    const productPage = response ? response : "";
-    if (productPage) {
-      let $ = cheerio.load(productPage); // LOADING HTML INTO CHEERIO
-      if ($(".couponBadge", productPage).text() === "Coupon") {
-        couponAmount = $('span:contains("Save an extra")', productPage)
-          .text()
-          .substr(15, 8)
-          .trim()
-          .split(" ");
-        console.log(couponAmount[0]);
-        isCouponAvailable = true;
-        console.log(isCouponAvailable);
-      } else {
-        couponAmount = "";
-      }
-      if ($("#productTitle", productPage).text() !== "") {
-        title = $("#productTitle", productPage).text();
-      }
-      if ($("#landingImage", productPage).attr("src") !== "") {
-        img = $("#landingImage", productPage).attr("src");
-      }
-      if ($("#priceblock_ourprice", productPage).text()) {
-        price = $("#priceblock_ourprice", productPage).text();
-        priceFrom = "Our Price";
-      } else if ($("#priceblock_dealprice", productPage).text()) {
-        price = $("#priceblock_dealprice", productPage).text();
-        priceFrom = "Dealer Price";
-      } else if ($("#priceblock_saleprice", productPage).text()) {
-        price = $("#priceblock_saleprice", productPage).text();
-        priceFrom = "Sale Price";
-      } else {
-        return; // if price unavailable return
-      }
-      console.log(price + "    " + url + "\n " + isCouponAvailable);
-      finalResults.push({
-        title: title.trim(),
-        pricefrom: priceFrom,
-        price: price,
-        link: url,
-        img: img,
-        coupon: isCouponAvailable,
-        couponAmount: couponAmount[0] ? couponAmount[0] : "",
       });
-      console.log(urls.length);
-      console.log(title.trim());
-    } else {
-      console.log("Product Not Found !");
-      urls.push(url);
-      console.log(urls.length);
-    }
-  };
-  //----------------------------------------
-  //  DELAY AND FETCH SINGLE ITEM ---------
-  const getPricesDelay = async (urls) => {
-    async function load() {
-      for (const url of urls) {
-        await getPrices(url);
-      }
-    }
-
-    await load();
-    console.log(finalResults, finalResults.length);
-    res.send(finalResults);
-  };
-  //----------------------------------------
-  // STARTING POINT AND FETCH ALL URLS -----
-  function start(input) {
-    const searchPage = `https://www.amazon.com/s?k=${input}&ref=nb_sb_noss_2`;
-    axios(searchPage)
-      .then((response) => {
-        let $ = cheerio.load(response.data);
+  const body = await response.data;
+        let $ = cheerio.load(body);
         $(".s-asin", response.data).each(function (i) {
-          const tailLink = $(this)
-            .find("a" + ".s-no-outline")
-            .attr("href");
-          if (tailLink) {
-            urls.push(homeUrl + tailLink);
+          isCouponAvailable = false;
+          if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') {
+            couponAmount = $(this).find('.s-coupon-highlight-color').text()
+            isCouponAvailable = true;
+          } else {
+            couponAmount = "";
           }
-        });
-      })
-      .then(() => getPricesDelay(urls));
-  }
-  start(req.params.searchInput);
+          if ($(this).find('span' + '.a-text-normal').text() !== "") {
+            title = $(this).find('span' + '.a-text-normal').text();
+          }
+          if ($(this).find('img' + '.s-image').attr("src") !== "") {
+            img = $(this).find('img' + '.s-image').attr("src");
+          }
+          if ($(this).find('span' + '.a-price-whole').text() !== '') {
+            priceWhole = $(this).find('span' + '.a-price-whole').text();
+            priceFraction = $(this).find('span' + '.a-price-fraction').text();
+          }
+          if ($(this).find('a' + '.a-link-normal').attr('href') !== '') {
+            url = $(this).find('a' + '.a-link-normal').attr('href');
+          }
+          finalResults.push({
+                  title: title.trim(),
+                  priceWhole: priceWhole,
+                  priceFraction: priceFraction,
+                  link: homeUrl + url,
+                  img: img,
+                  coupon: isCouponAvailable,
+                  couponAmount: couponAmount ? couponAmount : "",
+                });
+        });                                                         
+   res.send(finalResults);
+    } catch (err) {
+   res.send(err)
+    }
 });
 // LISTENING FOR THE PORT -----
 app.listen(PORT, () => {
