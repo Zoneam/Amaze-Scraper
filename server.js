@@ -21,12 +21,16 @@ app.get("/api/:searchInput", async (req, res) => {
   let title = '';
   let couponAmount = '';
   let isCouponAvailable = false;
+  let response;
   try {
-    const response = await axios({
-      url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
-      TIMEOUT: 5000
-    });
-  console.log(response.ok) 
+    do {
+      response = await axios({
+        url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
+        timeout: 5000
+      });
+    } while (
+      response.status !== 200
+    )
   const body = await response.data;
         let $ = cheerio.load(body);
         $(".s-asin", response.data).each(function (i) {
