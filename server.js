@@ -4,7 +4,7 @@ const express = require("express");
 const path = require("path");
 const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 // const cors = require("cors");
 const app = express();
 // app.use(cors());
