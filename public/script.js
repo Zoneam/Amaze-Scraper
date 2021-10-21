@@ -63,9 +63,7 @@ async function getWalmartPrice(id, title) {
       headers: {
         Accept: "application/json",
       },
-    }).catch(function(error) {
-      console.log(error);
-  })
+    })
       .then((response) => response.json())
       .then((result) => {
         console.log(id, result);
