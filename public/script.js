@@ -1,18 +1,8 @@
 const searchButton = document.getElementById("searchButton");
 
-// var input = document.getElementById("myInput");
-// input.addEventListener("keyup", function(event) {
-//     if (event.keyCode === 13) {
-//         event.preventDefault();
-//         document.getElementById("myBtn").click();
-//     }
-// });
-
-
 searchButton.addEventListener("click", async (e) => {
   e.preventDefault();
   const searchInput = document.getElementById("searchInput").value.trim();
-
   fetch(`/api/${searchInput}`, {
     method: "GET",
     headers: {
@@ -27,7 +17,6 @@ searchButton.addEventListener("click", async (e) => {
       });
     });
 });
-
 
 const drawCards = (result) => {
     let cards = "";
@@ -44,14 +33,14 @@ const drawCards = (result) => {
               <div class="d-flex justify-content-between align-items-center flex-column mt-2">
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.open('${result[i].link}','_blank')">Buy Now</button>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" id="${i}card">WalMart Price</button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="${i}_card" onclick="getWalmartPrice(this.id, $(this).parents().eq(1).siblings().children('p').text())">WalMart Price</button>
                 </div>
                 ${result[i].couponAmount ? `<large class="bg-success text-white p-2 bg-opacity-75 mt-2 rounded">${result[i].couponAmount}</large>` : ''}
               </div>
             </div>
           </div>
         </div>`;
-    }
+  }
   $("#cards").html(cards?cards:'<h2>No Search Results Yet!</h2>');
   localStorage.setItem('lastSearch', JSON.stringify(result));
 }
@@ -65,6 +54,18 @@ if (storedCards) {
 
 
 
-// function getWalmartPrice(e) {
-//   console.log(document.getElementById(`#title_${i}`))
-// }
+function getWalmartPrice(id, title) {
+  console.log(id.split("_")[0], title)
+
+  fetch(`/api/walmart/${title}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+          console.log(result);
+      });
+
+}
