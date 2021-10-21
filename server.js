@@ -21,7 +21,7 @@ app.get("/api/walmart/:title", async (req, res) => {
         price: '$76.00',
         grade: 12
       });
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
