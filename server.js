@@ -4,42 +4,46 @@ const express = require("express");
 const path = require("path");
 const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
+const puppeteer = require("puppeteer");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 // ENDPOINTS
 app.get("/api/walmart/:title", async (req, res) => {
-  let titles = [];
+  let items = [];
+  let searchItem = req.params.title;
+  let walmartItemArray = [];
+  let searchItemArray = searchItem.split(' ');
+  let gradedItemSearch = [];
   try {
-    const response = await axios({
-      method: 'GET',
-      url: `https://www.walmart.com/search?q=${req.params.title}`,
-      timeout: 5000,
-      headers: {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "accept-language": "en-US,en;q=0.9,ko;q=0.8",
-        "cache-control": "no-cache",
-        "pragma": "no-cache",
-        "referer": "https://www.walmart.com/"
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
+    const html = await page.content();
+    const $ = cheerio.load(html);
+    $(".pa0-xl", html).each(function (i) {
+      if ($(this).find('span' + '.lh-title').text() !== '') {
+        items.push({
+          title: $(this).find('span' + '.lh-title').text(),
+          price: $(this).children().find('div' + '.mr2-xl').text(),
+        })
       }
     })
-    console.log(response.data)
-    const body = await response.data;
-    let $ = cheerio.load(body);
-
-    $(".pa0-xl", response.data).each(function (i) {
-    console.log("this")
-      // if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') {
-      //   couponAmount = $(this).find('.s-coupon-highlight-color').text()
-      //   isCouponAvailable = true;
-      // } else {
-      //   couponAmount = "";
-      // }
-
+    items.forEach(item => {
+      item.grade = 0;
+      walmartItemArray = item.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
+      searchItemArray.forEach(searchItemWord => {
+        if (walmartItemArray.includes(searchItemWord)) {
+          item.grade += 1;
+        }
+      })
+      gradedItemSearch.push(item);
     })
+    gradedItemSearch.sort((a,b) => b.grade - a.grade);
+    res.send(gradedItemSearch[0])
   } catch (err) {
+    console.log(err)
     res.send(err);
   }
 })
@@ -56,7 +60,7 @@ app.get("/api/:searchInput", async (req, res) => {
   let isCouponAvailable = false;
 
   try {
-      const response = await fetch({
+      const response = await axios({
         method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
         timeout: 5000,
