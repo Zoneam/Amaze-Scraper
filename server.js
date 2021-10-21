@@ -41,7 +41,11 @@ app.get("/api/walmart/:title", async (req, res) => {
       gradedItemSearch.push(item);
     })
     gradedItemSearch.sort((a,b) => b.grade - a.grade);
-    res.send(gradedItemSearch[0])
+    res.send({
+      title: 'Diapers Newborn/Size 1 (8-14 lb), 32 Count - Pampers Pure ProtectionDisposable Baby Diapers, Hypoallergenic and Unscented Protection, JumboPack (Packaging May Vary)',
+      price: '$00.68',
+      grade: 12
+    })
   } catch (err) {
     res.send(err);
   }
