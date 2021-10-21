@@ -17,7 +17,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let searchItemArray = searchItem.split(' ');
   let gradedItemSearch = [];
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
@@ -30,22 +30,18 @@ app.get("/api/walmart/:title", async (req, res) => {
         })
       }
     })
-    items.forEach( async item => {
+    items.forEach(item => {
       item.grade = 0;
       walmartItemArray = item.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
-      searchItemArray.forEach( async searchItemWord => {
+      searchItemArray.forEach(searchItemWord => {
         if (walmartItemArray.includes(searchItemWord)) {
           item.grade += 1;
         }
       })
       gradedItemSearch.push(item);
     })
-    gradedItemSearch.sort(async (a,b) => await b.grade - a.grade);
-    res.send(gradedItemSearch[0]?JSON.stringify(gradedItemSearch[0]):JSON.stringify({
-      title: 'Diapers Newborn/Size 1 (8-14 lb), 32 Count - Pampers Pure ProtectionDisposable Baby Diapers, Hypoallergenic and Unscented Protection, JumboPack (Packaging May Vary)',
-      price: '$19.68',
-      grade: 12
-    }))
+    gradedItemSearch.sort((a,b) => b.grade - a.grade);
+    res.send(gradedItemSearch[0])
   } catch (err) {
     res.send(err);
   }
