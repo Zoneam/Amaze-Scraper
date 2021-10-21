@@ -17,7 +17,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let searchItemArray = searchItem.split(' ');
   let gradedItemSearch = [];
   try {
-    const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox'] });
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
