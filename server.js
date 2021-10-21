@@ -43,11 +43,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     gradedItemSearch.sort((a,b) => b.grade - a.grade);
     res.send(gradedItemSearch[0])
   } catch (err) {
-    res.send({
-      title: 'Pampers Baby-Dry Extra Protection Diapers, Size 1, 204 Count',
-      price: '11',
-      grade: 9
-    });
+    res.send(err);
   }
 })
 
