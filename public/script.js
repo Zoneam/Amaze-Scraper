@@ -58,7 +58,6 @@ function getWalmartPrice(id, title) {
  id = id.split("_")[0], title
   
   let filteredTitle = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
-  console.log(filteredTitle);
   fetch(`/api/walmart/${filteredTitle}`, {
       method: "GET",
       headers: {
@@ -67,7 +66,7 @@ function getWalmartPrice(id, title) {
     })
       .then((response) => response.json())
       .then((result) => {
-        console.log(id);
+        console.log(id, result);
         document.getElementById(`${id}-walmart-price`).innerHTML = result.price;
       });
 }
