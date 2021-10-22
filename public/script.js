@@ -54,17 +54,16 @@ if (storedCards) {
 }
 
 
-async function getWalmartPrice(id, title) {
+function getWalmartPrice(id, title) {
  id = id.split("_")[0], title
-  
   let filteredTitle = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
-  await fetch(`/api/walmart/${filteredTitle}`, {
+  fetch(`/api/walmart/${filteredTitle}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
       },
     })
-      .then((response) => response.json())
+    .then((response) =>  response.json())
       .then((result) => {
         console.log(id, result);
         document.getElementById(`${id}-walmart-price`).innerHTML = result.price;

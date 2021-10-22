@@ -22,6 +22,28 @@ app.get("/api/walmart/:title", async (req, res) => {
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
     const $ = cheerio.load(html);
+    // await mouse.click($('#px-captcha' ,html), {delay: 10000});
+
+    // await page.waitForFunction(() => 
+    // document.querySelector("ul").innerText.includes("mouseup")
+  // );
+    // console.log(html)
+    // console.log('-------------------------')
+    // console.log($('p' + '.bot-message', html).text())
+   
+
+
+    // if ($('div' + '[aria-label="Human Challenge requires verification. Please press and hold the button until verified"]', html).id) {
+    //   res.send({
+    //     price: 12,
+    //     title: "hello",
+    //     grade: 12
+    //   })
+
+    // }
+
+
+
     $(".pa0-xl", html).each(function (i) {
       if ($(this).find('span' + '.lh-title').text() !== '') {
         items.push({
