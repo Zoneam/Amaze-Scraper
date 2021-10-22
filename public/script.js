@@ -23,12 +23,12 @@ const drawCards = (result) => {
     for (i = 0; i < result.length; i++) {
       cards += `<div class="col">
           <div class="card shadow-lg">
-            <a href='${result[i].link}'>
+            <a href='${result[i].link}' target="_blank">
              <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Price: $${result[i].priceWhole + result[i].priceFraction}</text>
-             <rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='bg-success bg-gradient text-dark p-2 bg-opacity-50'></text></img>
+             <a class="mt-4" id="${i}-walmart-link" href = '' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='d-none bg-success bg-gradient text-dark p-2 bg-opacity-50'></text></a>
             </a>
             <div class="card-body">
-            <a href='${result[i].link}'>
+            <a href='${result[i].link}' target="_blank">
               <p class="card-text" id="title_${i}">${result[i].title}</p>
             </a>
               <div class="d-flex justify-content-between align-items-center flex-column mt-2">
@@ -64,8 +64,11 @@ function getWalmartPrice(id, title) {
       },
     })
     .then((response) =>  response.json())
-      .then((result) => {
+    .then((result) => {
+      
         console.log(id, result);
-        document.getElementById(`${id}-walmart-price`).innerHTML = result.price;
+        document.getElementById(`${id}-walmart-price`).classList.remove('d-none');
+        document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.price;
+        document.getElementById(`${id}-walmart-link`).href = result.link;
       });
 }

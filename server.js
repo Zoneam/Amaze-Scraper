@@ -17,7 +17,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let searchItemArray = searchItem.split(' ');
   let gradedItemSearch = [];
   try {
-    const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox'] }); // needs to be headless on heroku, cannot bypass CAPTCHA on walmart.com
+    const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox'] }); // needs to be headless on heroku, still cannot bypass CAPTCHA on walmart.com
     const page = await browser.newPage();
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
@@ -27,6 +27,7 @@ app.get("/api/walmart/:title", async (req, res) => {
         items.push({
           title: $(this).find('span' + '.lh-title').text(),
           price: $(this).children().find('div' + '.mr2-xl').text(),
+          link: 'https://www.walmart.com/' + $(this).children().find('a' + '.z-1').attr('href'),
         })
       }
     })
