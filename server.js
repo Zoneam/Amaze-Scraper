@@ -17,17 +17,33 @@ app.get("/api/walmart/:title", async (req, res) => {
   let searchItemArray = searchItem.split(' ');
   let gradedItemSearch = [];
   try {
-    const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox'] }); // needs to be headless on heroku, still cannot bypass CAPTCHA on walmart.com
+    const browser = await puppeteer.launch({
+        args: ['--window-size=1920,1080',
+          '--no-sandbox', "--disable-setuid-sandbox"
+      ]
+    }); // needs to be headless on heroku
     const page = await browser.newPage();
+    await page.setExtraHTTPHeaders({
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
+      'upgrade-insecure-requests': '1',
+      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+      'accept-encoding': 'gzip, deflate, br',
+      'accept-language': 'en-US,en;q=0.9,en;q=0.8',
+      'Access-Control-Allow-Origins': '*',
+      'accept': 'application/json',
+      'Content-Type': 'application/json'
+  })
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
+    await page.close();
+    await browser.close();
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
       if ($(this).find('span' + '.lh-title').text() !== '') {
         items.push({
           title: $(this).find('span' + '.lh-title').text(),
           price: $(this).children().find('div' + '.mr2-xl').text(),
-          link: 'https://www.walmart.com/' + $(this).children().find('a' + '.z-1').attr('href'),
+          link: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
         })
       }
     })
@@ -63,7 +79,7 @@ app.get("/api/:searchInput", async (req, res) => {
       const response = await axios({
         method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
-        timeout: 5000,
+        // timeout: 500,
         headers: {
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
           "Accept-Encoding": "gzip, deflate, br",
