@@ -32,7 +32,11 @@ app.get("/api/walmart/:title", async (req, res) => {
       'accept': 'application/json',
       'Content-Type': 'application/json'
   })
-    await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
+    await page.goto(`https://www.walmart.com/search?q=${searchItem}`, {
+      waitUntil: 'load',
+      // Remove the timeout
+      timeout: 0
+  } );
     const html = await page.content();
     await page.close();
     await browser.close();

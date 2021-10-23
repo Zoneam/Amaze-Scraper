@@ -18,7 +18,7 @@ searchButton.addEventListener("click", async (e) => {
     });
 });
 
-const drawCards = (result) => {
+const drawCards = async (result) => {
     let cards = "";
     for (i = 0; i < result.length; i++) {
       cards += `<div class="col">
@@ -44,6 +44,7 @@ const drawCards = (result) => {
   }
   $("#cards").html(cards?cards:'<h2>No Search Results Yet!</h2>');
   localStorage.setItem('lastSearch', JSON.stringify(result));
+ await autoGetPrices(result);
 }
 
 storedCards = JSON.parse(localStorage.getItem("lastSearch"));
@@ -53,17 +54,22 @@ if (storedCards) {
   $("#cards").html('<h2>No Search Results Yet!</h2>');
 }
 
+async function autoGetPrices(walmartData) {
+ await walmartData.forEach(async (item,id) => {
+   await getWalmartPrice(id, item.title)
+}); 
+}
 
-function getWalmartPrice(id, title) {
- id = id.split("_")[0], title
+async function getWalmartPrice(id, title) {
+//  id = id.split("_")[0], title
   let filteredTitle = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
-  fetch(`/api/walmart/${filteredTitle}`, {
+  await fetch(`/api/walmart/${filteredTitle}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
       },
     })
-    .then((response) =>  response.json())
+    .then( (response) =>  response.json())
     .then((result) => {
       
         console.log(id, result);
