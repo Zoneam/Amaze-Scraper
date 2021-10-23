@@ -18,7 +18,6 @@ app.get("/api/walmart/:title", async (req, res) => {
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
-        // headless: false,
         ignoreHTTPSErrors: true,
         slowMo: 0,
         args: ['--window-size=1920,1080',
@@ -43,7 +42,6 @@ app.get("/api/walmart/:title", async (req, res) => {
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
    
     const html = await page.content();
-    console.log('+9++', html)
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
       if ($(this).find('span' + '.lh-title').text() !== '') {
