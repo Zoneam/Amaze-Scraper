@@ -17,10 +17,33 @@ app.get("/api/walmart/:title", async (req, res) => {
   let searchItemArray = searchItem.split(' ');
   let gradedItemSearch = [];
   try {
-    const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox'] }); // needs to be headless on heroku, still cannot bypass CAPTCHA on walmart.com
+    const browser = await puppeteer.launch({
+        // headless: false,
+        ignoreHTTPSErrors: true,
+        slowMo: 0,
+        args: ['--window-size=1920,1080',
+        '--remote-debugging-port=9222',
+        "--remote-debugging-address=127.0.0.1", // You know what your doing?
+          '--disable-gpu', "--disable-features=IsolateOrigins,site-per-process", '--blink-settings=imagesEnabled=true',
+          '--no-sandbox', "--disable-setuid-sandbox"
+      ],
+      "defaultViewport": {
+        "height": 1080,
+        "width": 1920
+      },
+    }); // needs to be headless on heroku, still cannot bypass CAPTCHA on walmart.com
     const page = await browser.newPage();
+    await page.setExtraHTTPHeaders({
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+      'upgrade-insecure-requests': '1',
+      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+      'accept-encoding': 'gzip, deflate, br',
+      'accept-language': 'en-US,en;q=0.9,en;q=0.8'
+  })
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
+   
     const html = await page.content();
+    console.log('+9++', html)
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
       if ($(this).find('span' + '.lh-title').text() !== '') {
