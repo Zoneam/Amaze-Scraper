@@ -11,13 +11,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 
 
-async function getWalmartData(eachTitle) {
-  let items = [];
+async function getWalmartData(rawResults) {
+  
   let walmartItemArray = [];
   let gradedItemSearch = [];
-  let filteredTitle = eachTitle.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
-  let searchItemArray = filteredTitle.split(' ');
-
+  let filteredTitle = '';
+  let searchItemArray = [];
+  let verjnakan = [];
   try {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox']
@@ -34,36 +34,45 @@ async function getWalmartData(eachTitle) {
       'accept': 'application/json',
       'Content-Type': 'application/json'
     })
-    await page.goto(`https://www.walmart.com/search?q=${filteredTitle}`, {
-      waitUntil: 'load',
-      timeout: 0
-    });
-    const html = await page.content();
 
-    const $ = cheerio.load(html);
-    $(".pa0-xl", html).each(function (i) {
-      if ($(this).find('span' + '.lh-title').text() !== '') {
-        items.push({
-          walmartTitle: $(this).find('span' + '.lh-title').text(),
-          walmartPrice: $(this).children().find('div' + '.mr2-xl').text(),
-          walmartLink: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
-        })
-      }
-    })
-    items.forEach(item => {
-      item.grade = 0;
-      walmartItemArray = item.walmartTitle.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
-      searchItemArray.forEach(searchItemWord => {
-        if (walmartItemArray.includes(searchItemWord)) {
-          item.grade += 1;
+    for (let eachResult of rawResults) {
+
+      let items = [];
+      filteredTitle = eachResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
+      searchItemArray = filteredTitle.split(' ');
+      await page.goto(`https://www.walmart.com/search?q=${filteredTitle}`, {
+        waitUntil: 'load',
+        timeout: 0
+      });
+      const html = await page.content();
+      const $ = cheerio.load(html);
+      $(".pa0-xl", html).each(function (i) {
+        if ($(this).find('span' + '.lh-title').text() !== '') {
+          items.push({
+            walmartTitle: $(this).find('span' + '.lh-title').text(),
+            walmartPrice: $(this).children().find('div' + '.mr2-xl').text(),
+            walmartLink: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
+          })
         }
       })
-      gradedItemSearch.push(item);
-    })
-    gradedItemSearch.sort((a, b) => b.grade - a.grade);
-    await page.close();
-    // await browser.close();
-    return gradedItemSearch[0];
+      //-----------------
+      items.forEach(item => {  // grading items
+        item.grade = 0;
+        gradedItemSearch = [];
+        walmartItemArray = item.walmartTitle.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
+        searchItemArray.forEach(searchItemWord => {
+          if (walmartItemArray.includes(searchItemWord)) {
+            item.grade += 1;
+          }
+        })
+        gradedItemSearch.push(item);
+      })
+      //---------------------
+      gradedItemSearch.sort((a, b) => b.grade - a.grade);
+      verjnakan.push(gradedItemSearch[0]);
+      
+    }
+    return verjnakan
   } catch (err) {
     console.log(err)
   }
@@ -93,7 +102,6 @@ app.get("/api/:searchInput", async (req, res) => {
           "referer": "https://www.amazon.com/"
         }
       });
-    
   const body = await response.data;
         let $ = cheerio.load(body); // Loading response from page to cheerio
     $(".s-asin", response.data).each(function (i) {
@@ -138,9 +146,9 @@ app.get("/api/:searchInput", async (req, res) => {
      // Sending responce
     
     let index = 0;
-    for (let eachResult of finalResults) {
-      const walmartBestPriceItem = await getWalmartData(eachResult.title)
-      finalResults[index] = await { ...finalResults[index], ...walmartBestPriceItem }
+    const walmartBestPriceItem = await getWalmartData(finalResults)
+    for (let eachResult of walmartBestPriceItem) {
+      finalResults[index] = await { ...finalResults[index], ...walmartBestPriceItem[index] }
       index += 1;
     }
      res.send(finalResults);
