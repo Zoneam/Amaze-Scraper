@@ -25,7 +25,7 @@ const drawCards = async (result) => {
           <div class="card shadow-lg">
             <a href='${result[i].link}' target="_blank">
              <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Price: $${result[i].priceWhole + result[i].priceFraction}</text>
-             <a class="mt-4" id="${i}-walmart-link" href = '' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='d-none bg-success bg-gradient text-dark p-2 bg-opacity-50'></text></a>
+             <a class="mt-4" id="${i}-walmart-link" href = '${result[i].walmartLink}' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='bg-success bg-gradient text-dark p-2 bg-opacity-50'>At Walmart: ${result[i].walmartPrice}</text></a>
             </a>
             <div class="card-body">
             <a href='${result[i].link}' target="_blank">
@@ -44,7 +44,6 @@ const drawCards = async (result) => {
   }
   $("#cards").html(cards?cards:'<h2>No Search Results Yet!</h2>');
   localStorage.setItem('lastSearch', JSON.stringify(result));
- await autoGetPrices(result);
 }
 
 storedCards = JSON.parse(localStorage.getItem("lastSearch"));
@@ -52,29 +51,4 @@ if (storedCards) {
   drawCards(storedCards);
 } else {
   $("#cards").html('<h2>No Search Results Yet!</h2>');
-}
-
-async function autoGetPrices(walmartData) {
- await walmartData.forEach(async (item,id) => {
-   await getWalmartPrice(id, item.title)
-}); 
-}
-
-async function getWalmartPrice(id, title) {
-//  id = id.split("_")[0], title
-  let filteredTitle = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
-  await fetch(`/api/walmart/${filteredTitle}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    })
-    .then( (response) =>  response.json())
-    .then((result) => {
-      
-        console.log(id, result);
-        document.getElementById(`${id}-walmart-price`).classList.remove('d-none');
-        document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.price;
-        document.getElementById(`${id}-walmart-link`).href = result.link;
-      });
 }

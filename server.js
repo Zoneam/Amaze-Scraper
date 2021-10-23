@@ -9,19 +9,21 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
-// ENDPOINTS
-app.get("/api/walmart/:title", async (req, res) => {
+
+
+async function getWalmartData(eachTitle) {
   let items = [];
-  let searchItem = req.params.title;
   let walmartItemArray = [];
-  let searchItemArray = searchItem.split(' ');
   let gradedItemSearch = [];
+  let filteredTitle = eachTitle.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
+  let searchItemArray = filteredTitle.split(' ');
+
   try {
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
+      args: ['--no-sandbox']
     }); // needs to be headless on heroku
     const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
+    page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
     await page.setExtraHTTPHeaders({
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
       'upgrade-insecure-requests': '1',
@@ -31,28 +33,26 @@ app.get("/api/walmart/:title", async (req, res) => {
       'Access-Control-Allow-Origins': '*',
       'accept': 'application/json',
       'Content-Type': 'application/json'
-  })
-    await page.goto(`https://www.walmart.com/search?q=${searchItem}`, {
+    })
+    await page.goto(`https://www.walmart.com/search?q=${filteredTitle}`, {
       waitUntil: 'load',
-      // Remove the timeout
       timeout: 0
-  } );
+    });
     const html = await page.content();
-    await page.close();
-    await browser.close();
+
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
       if ($(this).find('span' + '.lh-title').text() !== '') {
         items.push({
-          title: $(this).find('span' + '.lh-title').text(),
-          price: $(this).children().find('div' + '.mr2-xl').text(),
-          link: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
+          walmartTitle: $(this).find('span' + '.lh-title').text(),
+          walmartPrice: $(this).children().find('div' + '.mr2-xl').text(),
+          walmartLink: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
         })
       }
     })
     items.forEach(item => {
       item.grade = 0;
-      walmartItemArray = item.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
+      walmartItemArray = item.walmartTitle.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
       searchItemArray.forEach(searchItemWord => {
         if (walmartItemArray.includes(searchItemWord)) {
           item.grade += 1;
@@ -60,13 +60,14 @@ app.get("/api/walmart/:title", async (req, res) => {
       })
       gradedItemSearch.push(item);
     })
-    gradedItemSearch.sort((a,b) => b.grade - a.grade);
-    res.send(gradedItemSearch[0])
+    gradedItemSearch.sort((a, b) => b.grade - a.grade);
+    await page.close();
+    // await browser.close();
+    return gradedItemSearch[0];
   } catch (err) {
-    res.send(err);
+    console.log(err)
   }
-})
-
+}
 //----------------
 app.get("/api/:searchInput", async (req, res) => {
   let url = '';
@@ -77,7 +78,7 @@ app.get("/api/:searchInput", async (req, res) => {
   let title = '';
   let couponAmount = '';
   let isCouponAvailable = false;
-
+  let walmartObject = [];
   try {
       const response = await axios({
         method: 'GET',
@@ -122,7 +123,8 @@ app.get("/api/:searchInput", async (req, res) => {
             url = $(this).find('a' + '.a-link-normal').attr('href');
           }
           // pushing info for each product into our array of object
-          finalResults.push({
+      finalResults.push({
+                  id: i,
                   title: title.trim(),
                   priceWhole: priceWhole,
                   priceFraction: priceFraction,
@@ -132,7 +134,16 @@ app.get("/api/:searchInput", async (req, res) => {
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });                                                         
-   res.send(finalResults);  // Sending responce
+    finalResults.length = 5;
+     // Sending responce
+    
+    let index = 0;
+    for (let eachResult of finalResults) {
+      const walmartBestPriceItem = await getWalmartData(eachResult.title)
+      finalResults[index] = await { ...finalResults[index], ...walmartBestPriceItem }
+      index += 1;
+    }
+     res.send(finalResults);
     } catch (err) {
    res.send(err)
     }
