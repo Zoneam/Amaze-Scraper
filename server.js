@@ -21,6 +21,7 @@ app.get("/api/walmart/:title", async (req, res) => {
         args: ['--no-sandbox']
     }); // needs to be headless on heroku
     const page = await browser.newPage();
+    await page.setDefaultNavigationTimeout(0); 
     await page.setExtraHTTPHeaders({
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
       'upgrade-insecure-requests': '1',
@@ -31,7 +32,7 @@ app.get("/api/walmart/:title", async (req, res) => {
       'accept': 'application/json',
       'Content-Type': 'application/json'
   })
-    await page.goto(`https://www.walmart.com/search?q=${searchItem}`, {waitUntil: 'load'});
+    await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
     await page.close();
     await browser.close();
