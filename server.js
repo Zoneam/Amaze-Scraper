@@ -134,7 +134,7 @@ app.get("/api/:searchInput", async (req, res) => {
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });                                                         
-    finalResults.length = 5;
+    finalResults.length = 2;
      // Sending responce
     
     let index = 0;
