@@ -18,11 +18,10 @@ app.get("/api/walmart/:title", async (req, res) => {
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
-        args: ['--window-size=1920,1080',
-          '--no-sandbox', "--disable-setuid-sandbox"
-      ]
+        args: ['--no-sandbox']
     }); // needs to be headless on heroku
     const page = await browser.newPage();
+    await page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
     await page.setExtraHTTPHeaders({
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
       'upgrade-insecure-requests': '1',
