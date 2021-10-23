@@ -20,11 +20,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     const browser = await puppeteer.launch({
         args: ['--window-size=1920,1080',
           '--no-sandbox', "--disable-setuid-sandbox"
-      ],
-      "defaultViewport": {
-        "height": 1080,
-        "width": 1920
-      },
+      ]
     }); // needs to be headless on heroku, still cannot bypass CAPTCHA on walmart.com
     const page = await browser.newPage();
     await page.setExtraHTTPHeaders({
@@ -62,6 +58,8 @@ app.get("/api/walmart/:title", async (req, res) => {
     })
     gradedItemSearch.sort((a,b) => b.grade - a.grade);
     res.send(gradedItemSearch[0])
+    await page.close();
+    await browser.close();
   } catch (err) {
     res.send(err);
   }
