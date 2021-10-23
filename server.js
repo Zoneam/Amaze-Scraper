@@ -35,6 +35,8 @@ app.get("/api/walmart/:title", async (req, res) => {
   })
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
     const html = await page.content();
+    await page.close();
+    await browser.close();
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
       if ($(this).find('span' + '.lh-title').text() !== '') {
@@ -57,8 +59,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     })
     gradedItemSearch.sort((a,b) => b.grade - a.grade);
     res.send(gradedItemSearch[0])
-    await page.close();
-    await browser.close();
+
   } catch (err) {
     res.send(err);
   }
