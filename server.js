@@ -80,7 +80,7 @@ app.get("/api/:searchInput", async (req, res) => {
       const response = await axios({
         method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
-        timeout: 5000,
+        // timeout: 500,
         headers: {
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
           "Accept-Encoding": "gzip, deflate, br",
