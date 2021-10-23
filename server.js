@@ -18,9 +18,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
-        args: ['--window-size=1920,1080',
-          '--no-sandbox', "--disable-setuid-sandbox"
-      ]
+        args: ['--no-sandbox']
     }); // needs to be headless on heroku
     const page = await browser.newPage();
     await page.setExtraHTTPHeaders({
@@ -33,7 +31,7 @@ app.get("/api/walmart/:title", async (req, res) => {
       'accept': 'application/json',
       'Content-Type': 'application/json'
   })
-    await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
+    await page.goto(`https://www.walmart.com/search?q=${searchItem}`, {waitUntil: 'load'});
     const html = await page.content();
     await page.close();
     await browser.close();
