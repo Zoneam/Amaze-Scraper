@@ -24,7 +24,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     }); // needs to be headless on heroku
     const page = await browser.newPage();
     await page.setExtraHTTPHeaders({
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
       'upgrade-insecure-requests': '1',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
       'accept-encoding': 'gzip, deflate, br',
@@ -34,7 +34,6 @@ app.get("/api/walmart/:title", async (req, res) => {
       'Content-Type': 'application/json'
   })
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
-   
     const html = await page.content();
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
