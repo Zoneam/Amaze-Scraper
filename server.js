@@ -59,7 +59,6 @@ app.get("/api/walmart/:title", async (req, res) => {
     })
     gradedItemSearch.sort((a,b) => b.grade - a.grade);
     res.send(gradedItemSearch[0])
-
   } catch (err) {
     res.send(err);
   }
