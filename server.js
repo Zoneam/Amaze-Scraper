@@ -5,6 +5,7 @@ const path = require("path");
 const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
+const { Console } = require("console");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -12,17 +13,18 @@ app.use(express.static(path.join(__dirname, "/public")));
 
 
 async function getWalmartData(rawResults) {
-  
-  let walmartItemArray = [];
-  let gradedItemSearch = [];
   let filteredTitle = '';
   let searchItemArray = [];
-  let verjnakan = [];
+  let bestPriceResults = [];
   try {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox']
     }); // needs to be headless on heroku
-    const page = await browser.newPage();
+    
+// await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36')
+    for (let eachResult of rawResults) {
+      const page = await browser.newPage();
+    
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
     await page.setExtraHTTPHeaders({
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
@@ -32,15 +34,14 @@ async function getWalmartData(rawResults) {
       'accept-language': 'en-US,en;q=0.9,en;q=0.8',
       'Access-Control-Allow-Origins': '*',
       'accept': 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Cookie': 'language=en'
     })
-
-    for (let eachResult of rawResults) {
-
+      let gradedItemSearch = [];
       let items = [];
       filteredTitle = eachResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
       searchItemArray = filteredTitle.split(' ');
-      await page.goto(`https://www.walmart.com/search?q=${filteredTitle}`, {
+      await page.goto(`https://www.walmart.com/search?q=${filteredTitle}`, { //
         waitUntil: 'load',
         timeout: 0
       });
@@ -49,7 +50,7 @@ async function getWalmartData(rawResults) {
       $(".pa0-xl", html).each(function (i) {
         if ($(this).find('span' + '.lh-title').text() !== '') {
           items.push({
-            walmartTitle: $(this).find('span' + '.lh-title').text(),
+            walmartTitle: $(this).find('span' + '.lh-title').text().replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' '),
             walmartPrice: $(this).children().find('div' + '.mr2-xl').text(),
             walmartLink: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
           })
@@ -58,10 +59,8 @@ async function getWalmartData(rawResults) {
       //-----------------
       items.forEach(item => {  // grading items
         item.grade = 0;
-        gradedItemSearch = [];
-        walmartItemArray = item.walmartTitle.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
         searchItemArray.forEach(searchItemWord => {
-          if (walmartItemArray.includes(searchItemWord)) {
+          if (item.walmartTitle.includes(searchItemWord)) {
             item.grade += 1;
           }
         })
@@ -69,10 +68,11 @@ async function getWalmartData(rawResults) {
       })
       //---------------------
       gradedItemSearch.sort((a, b) => b.grade - a.grade);
-      verjnakan.push(gradedItemSearch[0]);
-      
+      bestPriceResults.push(gradedItemSearch[0]);
+      await page.close();
     }
-    return verjnakan
+    await browser.close();
+    return bestPriceResults;
   } catch (err) {
     console.log(err)
   }
@@ -142,7 +142,7 @@ app.get("/api/:searchInput", async (req, res) => {
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });                                                         
-    finalResults.length = 2;
+    // finalResults.length = 8 ;
      // Sending responce
     
     let index = 0;
