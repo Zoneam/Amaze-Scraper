@@ -5,7 +5,6 @@ const path = require("path");
 const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
-const { Console } = require("console");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,7 +42,7 @@ async function getWalmartData(rawResults) {
       searchItemArray = filteredTitle.split(' ');
       await page.goto(`https://www.walmart.com/search?q=${filteredTitle}`, { //
         waitUntil: 'load',
-        timeout: 0
+        // timeout: 0
       });
       const html = await page.content();
       const $ = cheerio.load(html);
@@ -71,10 +70,9 @@ async function getWalmartData(rawResults) {
       bestPriceResults.push(gradedItemSearch[0]);
       await context.close();
     }
-    
     return bestPriceResults;
   } catch (err) {
-    console.log(err)
+    res.send(err)
   }
 }
 //----------------

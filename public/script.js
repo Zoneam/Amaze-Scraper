@@ -42,11 +42,17 @@ const drawCards = async (result) => {
           </div>
         </div>`;
   }
-  $("#cards").html(cards?cards:'<h2>No Search Results Yet!</h2>');
+  $("#cards").html(cards ? cards : '<h2>No Search Results Yet!</h2>');
+  
+
+
   localStorage.setItem('lastSearch', JSON.stringify(result));
 }
 
-storedCards = JSON.parse(localStorage.getItem("lastSearch"));
+// const getWalMartPrices = async () =>
+
+
+const storedCards = JSON.parse(localStorage.getItem("lastSearch"));
 if (storedCards) {
   drawCards(storedCards);
 } else {
