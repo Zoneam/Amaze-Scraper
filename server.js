@@ -72,7 +72,7 @@ async function getWalmartData(rawResults) {
     }
     return bestPriceResults;
   } catch (err) {
-    res.send(err)
+    res.send(bestPriceResults)
   }
 }
 //----------------
