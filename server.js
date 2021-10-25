@@ -21,9 +21,9 @@ async function getWalmartData(rawResults) {
       args: ['--no-sandbox']
     }); // needs to be headless on heroku
     
-// await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36')
     for (let eachResult of rawResults) {
-      const page = await browser.newPage();
+      const context = await browser.createIncognitoBrowserContext();
+      const page = await context.newPage();
     
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
     await page.setExtraHTTPHeaders({
@@ -69,9 +69,9 @@ async function getWalmartData(rawResults) {
       //---------------------
       gradedItemSearch.sort((a, b) => b.grade - a.grade);
       bestPriceResults.push(gradedItemSearch[0]);
-      await page.close();
+      await context.close();
     }
-    await browser.close();
+    
     return bestPriceResults;
   } catch (err) {
     console.log(err)
@@ -142,7 +142,7 @@ app.get("/api/:searchInput", async (req, res) => {
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });                                                         
-    // finalResults.length = 8 ;
+    finalResults.length = 10 ;
      // Sending responce
     
     let index = 0;
