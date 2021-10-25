@@ -14,13 +14,11 @@ app.use(express.static(path.join(__dirname, "/public")));
 app.get("/api/walmart/:title", async (req, res) => {
   let items = [];
   let searchItem = req.params.title;
-  let walmartItemArray = [];
   let searchItemArray = searchItem.split(' ');
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox','--disable-gpu'],
-      
     }); // needs to be headless on heroku
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
@@ -38,9 +36,9 @@ app.get("/api/walmart/:title", async (req, res) => {
       'Cookie': 'language=en'
     })
 
-    await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { //
+    await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
         waitUntil: 'load',
-        timeout: 0
+        // timeout: 0
     });
     const html = await page.content();
     const $ = cheerio.load(html);
@@ -71,15 +69,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   }
 })
 
-
 //----------------
-
-
-
-
-
-
-
 
 app.get("/api/:searchInput", async (req, res) => {
   let url = '';
@@ -95,7 +85,6 @@ app.get("/api/:searchInput", async (req, res) => {
       const response = await axios({
         method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
-        // timeout: 500,
         headers: {
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
           "Accept-Encoding": "gzip, deflate, br",
@@ -144,7 +133,7 @@ app.get("/api/:searchInput", async (req, res) => {
             couponAmount: couponAmount ? couponAmount : "",
           });
   });                                                          
-    finalResults.length = 5 ;
+    finalResults.length = 10 ;
      // Sending responce
      res.send(finalResults);
     } catch (err) {
