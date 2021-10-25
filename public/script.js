@@ -67,10 +67,11 @@ function getWalmartPrice(id, title) {
     })
     .then((response) =>  response.json())
     .then((result) => {
-      
+      if (result) {
         console.log(id, result);
         document.getElementById(`${id}-walmart-price`).classList.remove('d-none');
         document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
         document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
+      }
       });
 }

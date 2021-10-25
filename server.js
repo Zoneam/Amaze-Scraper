@@ -10,74 +10,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 
-
-// async function getWalmartData(rawResults) {
-//   let filteredTitle = '';
-//   let searchItemArray = [];
-//   let bestPriceResults = [];
-//   try {
-//     const browser = await puppeteer.launch({
-//       args: ['--no-sandbox']
-//     }); // needs to be headless on heroku
-    
-//     for (let eachResult of rawResults) {
-//       const context = await browser.createIncognitoBrowserContext();
-//       const page = await context.newPage();
-    
-//     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
-//     await page.setExtraHTTPHeaders({
-//       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
-//       'upgrade-insecure-requests': '1',
-//       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-//       'accept-encoding': 'gzip, deflate, br',
-//       'accept-language': 'en-US,en;q=0.9,en;q=0.8',
-//       'Access-Control-Allow-Origins': '*',
-//       'accept': 'application/json',
-//       'Content-Type': 'application/json',
-//       'Cookie': 'language=en'
-//     })
-//       let gradedItemSearch = [];
-//       let items = [];
-//       filteredTitle = eachResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
-//       searchItemArray = filteredTitle.split(' ');
-//       await page.goto(`https://www.walmart.com/search?q=${filteredTitle}`, { //
-//         // waitUntil: 'load',
-//         // timeout: 0
-//       });
-
-
-//       const html = await page.content();
-//       const $ = cheerio.load(html);
-
-//       $(".pa0-xl", html).each(function (i) {
-//         if ($(this).find('span' + '.lh-title').text() !== '') {
-//           items.push({
-//             walmartTitle: $(this).find('span' + '.lh-title').text().replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' '),
-//             walmartPrice: $(this).children().find('div' + '.mr2-xl').text()?$(this).children().find('div' + '.mr2-xl').text():$(this).children().find('div' + '.lh-copy').text(),
-//             walmartLink: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
-//           })
-//         }
-//       })
-//       //-----------------
-//       items.forEach(item => {  // grading items
-//         item.grade = 0;
-//         searchItemArray.forEach(searchItemWord => {
-//           if (item.walmartTitle.includes(searchItemWord)) {
-//             item.grade += 1;
-//           }
-//         })
-//         gradedItemSearch.push(item);
-//       })
-//       //---------------------
-//       gradedItemSearch.sort((a, b) => b.grade - a.grade);
-//       bestPriceResults.push(gradedItemSearch[0]);
-//       await context.close();
-//     }
-//     return bestPriceResults;
-//   } catch (err) {
-//     res.send(err)
-//   }
-// }
 ////--------------------
 app.get("/api/walmart/:title", async (req, res) => {
   let items = [];
@@ -87,11 +19,13 @@ app.get("/api/walmart/:title", async (req, res) => {
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
+      args: ['--no-sandbox','--disable-gpu'],
+      
     }); // needs to be headless on heroku
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
+
     await page.setExtraHTTPHeaders({
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
       'upgrade-insecure-requests': '1',
