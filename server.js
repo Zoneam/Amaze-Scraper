@@ -142,7 +142,7 @@ app.get("/api/:searchInput", async (req, res) => {
                   couponAmount: couponAmount ? couponAmount : "",
                 });
         });                                                         
-    finalResults.length = 10 ;
+    finalResults.length = 5 ;
      // Sending responce
     
     let index = 0;
