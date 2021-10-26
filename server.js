@@ -18,7 +18,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox','--disable-gpu'],
+      args: ['--no-sandbox']
     }); // needs to be headless on heroku
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
@@ -41,6 +41,7 @@ app.get("/api/walmart/:title", async (req, res) => {
       timeout: 0,
       waitUntil: 'domcontentloaded' 
     });
+    console.log(searchItem)
     const html = await page.content();
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
@@ -62,9 +63,9 @@ app.get("/api/walmart/:title", async (req, res) => {
       gradedItemSearch.push(item);
     })
     gradedItemSearch.sort((a, b) => b.grade - a.grade);
-    res.send(gradedItemSearch[0])
     await context.close();
     await browser.close();
+    res.send(gradedItemSearch[0])
   } catch (err) {
     res.send(err);
   }

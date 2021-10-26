@@ -10,10 +10,9 @@ searchButton.addEventListener("click", async (e) => {
     },
   })
     .then((response) => response.json())
-    .then((result) => {
-      console.log(result);
-      $(document).ready(function () {
-        drawCards(result);
+    .then(async (result) => {
+      $(document).ready( async function () {
+       await drawCards(result);
       });
     });
 });
@@ -60,7 +59,6 @@ if (storedCards) {
 
 
 async function getWalmartPrice(id, title) {
-//  id = id.split("_")[0], title
   let filteredTitle = title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, '%20');
   fetch(`/api/walmart/${filteredTitle}`, {
       method: "GET",
