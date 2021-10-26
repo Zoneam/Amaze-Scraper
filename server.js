@@ -23,7 +23,6 @@ app.get("/api/walmart/:title", async (req, res) => {
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
-
     await page.setExtraHTTPHeaders({
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
       'upgrade-insecure-requests': '1',
@@ -41,7 +40,6 @@ app.get("/api/walmart/:title", async (req, res) => {
       timeout: 0,
       waitUntil: 'domcontentloaded' 
     });
-    console.log(searchItem)
     const html = await page.content();
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
