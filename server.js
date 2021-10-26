@@ -6,8 +6,9 @@ const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
 const app = express();
+
+app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
 
 ////--------------------
@@ -18,7 +19,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox']
     }); // needs to be headless on heroku
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
@@ -40,7 +41,9 @@ app.get("/api/walmart/:title", async (req, res) => {
       timeout: 0,
       waitUntil: 'domcontentloaded' 
     });
+   
     const html = await page.content();
+    console.log(html)
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
               if ($(this).find('span' + '.lh-title').text() !== '') {
@@ -62,8 +65,9 @@ app.get("/api/walmart/:title", async (req, res) => {
     })
     gradedItemSearch.sort((a, b) => b.grade - a.grade);
     await context.close();
-    await browser.close();
+    
     res.send(gradedItemSearch[0])
+    // await browser.close();
   } catch (err) {
     res.send(err);
   }
@@ -133,7 +137,7 @@ app.get("/api/:searchInput", async (req, res) => {
             couponAmount: couponAmount ? couponAmount : "",
           });
   });                                                          
-    finalResults.length = 10 ;
+    finalResults.length = 3 ;
      // Sending responce
      res.send(finalResults);
     } catch (err) {
