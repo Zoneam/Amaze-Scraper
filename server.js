@@ -41,9 +41,7 @@ app.get("/api/walmart/:title", async (req, res) => {
       timeout: 0,
       waitUntil: 'domcontentloaded' 
     });
-   
     const html = await page.content();
-    console.log(html)
     const $ = cheerio.load(html);
     $(".pa0-xl", html).each(function (i) {
               if ($(this).find('span' + '.lh-title').text() !== '') {
@@ -67,7 +65,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     await context.close();
     
     res.send(gradedItemSearch[0])
-    // await browser.close();
+    await browser.close();
   } catch (err) {
     res.send(err);
   }
