@@ -65,23 +65,19 @@ async function fetchWalmart(filteredTitle,id) {
         Accept: "application/json"
       },
     }).then((response) =>  response.json())
-    .then((result) => {
-      // console.log(result)
-    if (result.data) {
+      .then((result) => {
       console.log(result)
+    if (result) {
       document.getElementById(`${id}-walmart-price`).classList.remove('d-none');
       document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
       document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
     }
-    
     })
     
   }catch (err) {
   console.log(err)
 }
 }
-
-
 
 storedCards = JSON.parse(localStorage.getItem("lastSearch"));
 if (storedCards) {

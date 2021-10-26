@@ -25,15 +25,17 @@ app.get("/api/walmart/:title", async (req, res) => {
     const page = await context.newPage();
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
     await page.setExtraHTTPHeaders({
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
-      'upgrade-insecure-requests': '1',
-      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-      'accept-encoding': 'gzip, deflate, br',
-      'accept-language': 'en-US,en;q=0.9,en;q=0.8',
-      'Access-Control-Allow-Origins': '*',
-      'accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Cookie': 'language=en'
+      "Connection": "keep-alive",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      "Referer": "https://www.google.com/",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Accept-Language": "en-US,en;q=0.9"
     })
 
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
@@ -63,7 +65,6 @@ app.get("/api/walmart/:title", async (req, res) => {
     })
     gradedItemSearch.sort((a, b) => b.grade - a.grade);
     await context.close();
-    
     res.send(gradedItemSearch[0])
     await browser.close();
   } catch (err) {
@@ -135,7 +136,7 @@ app.get("/api/:searchInput", async (req, res) => {
             couponAmount: couponAmount ? couponAmount : "",
           });
   });                                                          
-    finalResults.length = 3 ;
+    finalResults.length = 20 ;
      // Sending responce
      res.send(finalResults);
     } catch (err) {
