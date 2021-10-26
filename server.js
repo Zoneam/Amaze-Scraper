@@ -18,7 +18,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let gradedItemSearch = [];
   try {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     }); // needs to be headless on heroku
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
