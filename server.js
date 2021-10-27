@@ -6,67 +6,73 @@ const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
 const app = express();
+
+app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "/public")));
-// ENDPOINTS
+
 app.get("/api/walmart/:title", async (req, res) => {
   let items = [];
   let searchItem = req.params.title;
-  let walmartItemArray = [];
-  let searchItemArray = searchItem.split(' ');
-  let gradedItemSearch = [];
+  let searchTitleWordArray = searchItem.split(' '); // Braking our search title into array
+  let gradedItems = [];
   try {
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
+      args: ['--no-sandbox']
     }); // needs to be headless on heroku
-    const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
-    await page.setExtraHTTPHeaders({
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; X11; Ubuntu; Linux i686; rv:15.0) AppleWebKit/537.36 Gecko/20100101 Firefox/15.0.1 Chrome/74.0.3729.131 Safari/537.36',
-      'upgrade-insecure-requests': '1',
-      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-      'accept-encoding': 'gzip, deflate, br',
-      'accept-language': 'en-US,en;q=0.9,en;q=0.8',
-      'Access-Control-Allow-Origins': '*',
-      'accept': 'application/json',
-      'Content-Type': 'application/json'
-  })
-    await page.goto(`https://www.walmart.com/search?q=${searchItem}`);
-    const html = await page.content();
-    await page.close();
-    await browser.close();
-    const $ = cheerio.load(html);
-    $(".pa0-xl", html).each(function (i) {
-      if ($(this).find('span' + '.lh-title').text() !== '') {
-        items.push({
-          title: $(this).find('span' + '.lh-title').text(),
-          price: $(this).children().find('div' + '.mr2-xl').text(),
-          link: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
-        })
-      }
+    const context = await browser.createIncognitoBrowserContext();
+    const page = await context.newPage();
+    page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
+    await page.setExtraHTTPHeaders({  // Need to rotate headers to bypass CAPTCHA on walmart.com
+      "Connection": "keep-alive",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      "Referer": "https://www.google.com/",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Accept-Language": "en-US,en;q=0.9"
     })
-    items.forEach(item => {
-      item.grade = 0;
-      walmartItemArray = item.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' ');
-      searchItemArray.forEach(searchItemWord => {
-        if (walmartItemArray.includes(searchItemWord)) {
-          item.grade += 1;
+
+    await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
+      timeout: 0,
+      waitUntil: 'domcontentloaded' 
+    });
+    const html = await page.content();
+    const $ = cheerio.load(html);
+    $(".pa0-xl", html).each(function (i) { // finding each item on search page by class name
+              if ($(this).find('span' + '.lh-title').text() !== '') {
+                items.push({
+                  walmartTitle: $(this).find('span' + '.lh-title').text().replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' '),
+                  walmartPrice: $(this).children().find('div' + '.mr2-xl').text()?$(this).children().find('div' + '.mr2-xl').text():$(this).children().find('div' + '.lh-copy').text(),
+                  walmartLink: 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
+                  grade: 0,
+                })
+              }
+    })
+    items.forEach(item => {  // Grading each item on search page
+      searchTitleWordArray.forEach(searchTitleWord => {
+        if (item.walmartTitle.includes(searchTitleWord)) {
+          item.grade++;
         }
       })
-      gradedItemSearch.push(item);
+      gradedItems.push(item);
     })
-    gradedItemSearch.sort((a,b) => b.grade - a.grade);
-    res.send(gradedItemSearch[0])
+    gradedItems.sort((a, b) => b.grade - a.grade); // Sorting Graded items by grade
+    await context.close();
+    res.send(gradedItems[0]) // Sending back our hiest graded item
+    await browser.close();
   } catch (err) {
     res.send(err);
   }
 })
 
-//----------------
-app.get("/api/:searchInput", async (req, res) => {
+app.get("/api/:searchInput", async (req, res) => { // our GET request for amazon.com search
   let url = '';
-  let finalResults = [];
+  let productResults = [];
   let priceWhole ='';
   let priceFraction = '';
   let img = '';
@@ -75,11 +81,10 @@ app.get("/api/:searchInput", async (req, res) => {
   let isCouponAvailable = false;
 
   try {
-      const response = await axios({
+      const response = await axios({ // Amazon doesnt have CAPTCHA check, dont neet to worry about rotating headers here
         method: 'GET',
         url: `https://www.amazon.com/s?k=${req.params.searchInput}&ref=nb_sb_noss_1`,
-        // timeout: 500,
-        headers: {
+        headers: { 
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
           "Accept-Encoding": "gzip, deflate, br",
           "accept-language": "en-US,en;q=0.9,ko;q=0.8",
@@ -89,12 +94,13 @@ app.get("/api/:searchInput", async (req, res) => {
         }
       });
     
-  const body = await response.data;
-        let $ = cheerio.load(body); // Loading response from page to cheerio
-    $(".s-asin", response.data).each(function (i) {
+    const body = await response.data;
+    let $ = cheerio.load(body); // Loading response from page to cheerio
+
+    $(".s-asin", response.data).each(function (i) { // Finding products by Class name on search page
           // Finding Coupon 
           isCouponAvailable = false;
-          if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') {
+          if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') { // Looking for coupon if available
             couponAmount = $(this).find('.s-coupon-highlight-color').text()
             isCouponAvailable = true;
           } else {
@@ -118,19 +124,21 @@ app.get("/api/:searchInput", async (req, res) => {
             url = $(this).find('a' + '.a-link-normal').attr('href');
           }
           // pushing info for each product into our array of object
-          finalResults.push({
-                  title: title.trim(),
-                  priceWhole: priceWhole,
-                  priceFraction: priceFraction,
-                  link: homeUrl + url,
-                  img: img,
-                  coupon: isCouponAvailable,
-                  couponAmount: couponAmount ? couponAmount : "",
-                });
-        });                                                         
-   res.send(finalResults);  // Sending responce
+          productResults.push({
+            title: title.trim(),
+            priceWhole: priceWhole,
+            priceFraction: priceFraction,
+            link: homeUrl + url,
+            img: img,
+            coupon: isCouponAvailable,
+            couponAmount: couponAmount ? couponAmount : "",
+          });
+  });                                                          
+      productResults.length = 20;
+     // Sending responce
+      res.send(productResults); // Sending found products back
     } catch (err) {
-   res.send(err)
+      res.send(err)
     }
 });
 
