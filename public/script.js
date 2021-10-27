@@ -33,32 +33,24 @@ const drawCards = async (result) => {
           </div>
         </div>`;
       i++;
-      // console.log(i)
   }
   $("#cards").html(card ? card : '<h2>No Search Results Yet!</h2>');
-// console.log(result)
-   await getWalmartPrice(result);
-
+  await getWalmartPrice(result);
   localStorage.setItem('lastSearch', JSON.stringify(result));
 }
 
 async function getWalmartPrice(data) {
   let filteredTitle = '';
   let id = 0;
-
   for (let singleResult of data) {
     filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
     await fetchWalmart(filteredTitle, id)
     id++;
   }
-
-
 }
 
-
-async function fetchWalmart(filteredTitle,id) {
+async function fetchWalmart(filteredTitle, id) {
   try {
-    console.log(id, filteredTitle)
     await fetch(`/api/walmart/${filteredTitle}`, {
       method: "GET",
       headers: {
@@ -66,7 +58,6 @@ async function fetchWalmart(filteredTitle,id) {
       },
     }).then((response) =>  response.json())
       .then((result) => {
-      console.log(result)
     if (result) {
       document.getElementById(`${id}-walmart-price`).classList.remove('d-none');
       document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
@@ -76,7 +67,7 @@ async function fetchWalmart(filteredTitle,id) {
     
   }catch (err) {
   console.log(err)
-}
+  }
 }
 
 storedCards = JSON.parse(localStorage.getItem("lastSearch"));
