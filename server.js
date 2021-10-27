@@ -54,16 +54,32 @@ app.get("/api/walmart/:title", async (req, res) => {
               }
     })
     items.forEach(item => {  // Grading each item on search page
-      searchTitleWordArray.forEach(searchTitleWord => {
+      searchTitleWordArray.forEach((searchTitleWord,i) => {
         if (item.walmartTitle.includes(searchTitleWord)) {
+          if (searchTitleWord === item.walmartTitle[0] && i === 0) { // checking if first words in titles match
+            item.grade += 5;
+          }
+          if (searchTitleWord === item.walmartTitle[1] && i === 1) { // checking if second words in titles match
+            item.grade += 3;
+          }
+          if (searchTitleWord === item.walmartTitle[3] && i === 3) { // checking if third words in titles match
+            item.grade += 2;
+          }
           item.grade++;
         }
       })
       gradedItems.push(item);
     })
-    gradedItems.sort((a, b) => b.grade - a.grade); // Sorting Graded items by grade
+    
+    gradedItems.sort((a, b) => b.grade - a.grade); // Sorting Graded items by grade    
     await context.close();
-    res.send(gradedItems[0]) // Sending back our hiest graded item
+
+    if (Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length) < 65) { // checking if 65% words in title match
+      res.sendStatus(404) // Sending N/A back
+    } else {
+      res.send(gradedItems[0]) // Sending back our hiest graded item
+    }
+
     await browser.close();
   } catch (err) {
     res.send(err);
