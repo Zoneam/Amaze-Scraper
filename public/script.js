@@ -16,7 +16,9 @@ const drawCards = async (result) => {
           <div class="card shadow-lg">
             <a href='${result[i].link}' target="_blank">
              <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Price: $${result[i].priceWhole + result[i].priceFraction}</text>
-             <a class="mt-4" id="${i}-walmart-link" href = '' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='d-none bg-gradient text-dark p-2 bg-opacity-50'></text></a>
+             <a class="mt-4" id="${i}-walmart-link" href = '' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><div id="${i}-loading-spinner" class="spinner-border spinner-border-sm ml-0" role="status">
+
+           </div><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='d-none bg-gradient text-dark p-2 bg-opacity-50'></text></a>
             </a>
             <div class="card-body">
             <a href='${result[i].link}' target="_blank">
@@ -40,7 +42,7 @@ const drawCards = async (result) => {
 async function getWalmartPrice(data) {
   let filteredTitle = '';
   let id = 0;
-  for (let singleResult of data) {
+  for (singleResult of data) {
     filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
     await fetchWalmart(filteredTitle, id)
     id++;
@@ -56,13 +58,15 @@ async function fetchWalmart(filteredTitle, id) {
       },
     }).then((response) => response.json())
       .then((result) => {
-    if (result) {
-      document.getElementById(`${id}-walmart-price`).classList.replace('d-none', 'bg-success');
-      document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
-      document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
+        if (result) {
+          document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
+          document.getElementById(`${id}-walmart-price`).classList.replace('d-none', 'bg-success');
+          document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
+          document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
     }
     })
   } catch (err) {
+    document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
     document.getElementById(`${id}-walmart-price`).classList.replace('d-none','bg-danger');
     document.getElementById(`${id}-walmart-price`).innerHTML = "Not Available At Walmart";
   }
