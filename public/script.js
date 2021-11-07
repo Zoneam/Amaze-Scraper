@@ -2,7 +2,6 @@ const searchButton = document.getElementById("searchButton");
 
 searchButton.addEventListener("click", async (e) => {
   e.preventDefault();
-  
   const searchInput = document.getElementById("searchInput").value.trim();
   result = await axios(`/api/${searchInput}`)
   $(document).ready(async function () {
@@ -35,17 +34,16 @@ const drawCards = async (result) => {
         </div>`;
   }
   $("#cards").html(card ? card : '<h2>No Search Results Yet!</h2>');
-  await getWalmartPrice(result);
+  getWalmartPrice(result);
   localStorage.setItem('lastSearch', JSON.stringify(result));
 }
 
-async function getWalmartPrice(data) {
+function getWalmartPrice(data) {  // need to terminate this function to stop previous search 
   let filteredTitle = '';
   let id = 0;
   for (singleResult of data) {
       filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
-      await fetchWalmart(filteredTitle, id)
-      console.log(id, filteredTitle)
+      fetchWalmart(filteredTitle, id)
       id++;
   }
 }
