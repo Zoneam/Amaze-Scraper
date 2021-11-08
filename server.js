@@ -24,16 +24,11 @@ app.get("/api/walmart/:title", async (req, res) => {
     const page = await context.newPage();
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
     await page.setExtraHTTPHeaders({  // Need to rotate headers to bypass CAPTCHA on walmart.com
-      "Connection": "keep-alive",
-      "Upgrade-Insecure-Requests": "1",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-      "Sec-Fetch-Site": "same-origin",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Dest": "sequrity",
-      "Referer": "https://www.yahoo.com/",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "en-US,en;q=0.9"
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+      'upgrade-insecure-requests': '1',
+      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+      'accept-encoding': 'gzip, deflate, br',
+      'accept-language': 'en-US,en;q=0.9,en;q=0.8'
     })
 
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
