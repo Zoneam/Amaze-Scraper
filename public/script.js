@@ -43,7 +43,7 @@ function getWalmartPrice(data) {  // need to terminate this function to stop pre
   let id = 0;
   for (singleResult of data) {
       filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
-      fetchWalmart(filteredTitle, id)
+      await fetchWalmart(filteredTitle, id)
       id++;
   }
 }
