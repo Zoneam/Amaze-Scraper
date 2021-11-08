@@ -55,7 +55,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     items.forEach(item => {  // Grading each item on search page
       searchTitleWordArray.forEach((searchTitleWord,i) => {
         if (item.walmartTitle.includes(searchTitleWord)) {
-          if (searchTitleWord === item.walmartTitle[0] && i === 0) { // checking if first words in titles match
+          if (searchTitleWord === item.walmartTitle[0] && i === 0) { // checking if first word in titles match
             item.grade += 5;
           }
           if (searchTitleWord === item.walmartTitle[1] && i === 1) { // checking if second words in titles match

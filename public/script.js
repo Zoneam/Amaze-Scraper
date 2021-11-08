@@ -34,11 +34,11 @@ const drawCards = async (result) => {
         </div>`;
   }
   $("#cards").html(card ? card : '<h2>No Search Results Yet!</h2>');
-  getWalmartPrice(result);
+  getWalmartPrice(result); // await here 
   localStorage.setItem('lastSearch', JSON.stringify(result));
 }
 
-function getWalmartPrice(data) {  // need to terminate this function to stop previous search 
+async function getWalmartPrice(data) {  // need to terminate this function to stop previous search 
   let filteredTitle = '';
   let id = 0;
   for (singleResult of data) {
@@ -71,6 +71,7 @@ async function fetchWalmart(filteredTitle, id) {
   }
 }
 
+// gets last search
 storedCards = JSON.parse(localStorage.getItem("lastSearch"));
 if (storedCards) {
   drawCards(storedCards);
