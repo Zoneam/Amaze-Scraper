@@ -12,7 +12,6 @@ searchButton.addEventListener("click", async (e) => {
 
 const drawCards = async (result) => {
   let card = "";
-  
   for (let i = 0; i < result.length; i++) {
       card += `<div class="col">
           <div class="card shadow-lg">
@@ -43,8 +42,7 @@ const drawCards = async (result) => {
  async function getWalmartPrice(data, callId) {  // need to terminate this function to stop previous search 
   let filteredTitle = '';
   let id = 0;
-  console.log(calls,':',callId)
-  for  (singleResult of data) {
+  for (singleResult of data) {
     if (callId !== calls) break;  // if call id changes brakes from previous for loop
     filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
     await fetchWalmart(filteredTitle, id)
