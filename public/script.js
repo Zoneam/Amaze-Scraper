@@ -1,4 +1,5 @@
 const searchButton = document.getElementById("searchButton");
+let calls = 0;
 
 searchButton.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -34,15 +35,16 @@ const drawCards = async (result) => {
         </div>`;
   }
   $("#cards").html(card ? card : '<h2>No Search Results Yet!</h2>');
-  getWalmartPrice(result); // await here 
+  await getWalmartPrice(result, ++calls); 
   localStorage.setItem('lastSearch', JSON.stringify(result));
 }
 
-async function getWalmartPrice(data) {  // need to terminate this function to stop previous search 
+ async function getWalmartPrice(data, callId) {  // need to terminate this function to stop previous search 
   let filteredTitle = '';
   let id = 0;
   console.log(data)
   for (singleResult of data) {
+    if (callId !== calls) break;  // if call id changes brakes from previous for loop
     filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
     await fetchWalmart(filteredTitle, id)
     id++;
