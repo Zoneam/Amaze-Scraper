@@ -1,5 +1,7 @@
 ## _[Deployed - Amaze Scrape](https://amaze-scrape.herokuapp.com/)_
 
+If you get "At Walmart: undefined" on products, that means walmart CAPTCHA checker caught our bot! need to wait some time and retry.
+
 # Puppeteer-heroku-buildpack
 
 Install dependencies needed in order to run puppeteer on heroku. Be sure to include `{ args: ['--no-sandbox'] }` in your call to `puppeteer.launch`. 
