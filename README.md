@@ -1,4 +1,4 @@
-## _[Amaze Scrape](https://amaze-scrape.herokuapp.com/)_
+## _[dEPLOYED - Amaze Scrape](https://amaze-scrape.herokuapp.com/)_
 
 # Puppeteer-heroku-buildpack
 
