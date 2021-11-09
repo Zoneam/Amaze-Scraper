@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, "/public")));
 app.get("/api/walmart/:title", async (req, res) => {
   let items = [];
   let searchItem = req.params.title;
-  let searchTitleWordArray = searchItem.split(' '); // Braking our search title into array
+  let searchTitleWordArray = searchItem.split(' '); // Braking our search title into array of words
   let gradedItems = [];
   try {
     const browser = await puppeteer.launch({

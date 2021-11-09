@@ -41,10 +41,11 @@ const drawCards = async (result) => {
 async function getWalmartPrice(data) {  // need to terminate this function to stop previous search 
   let filteredTitle = '';
   let id = 0;
+  console.log(data)
   for (singleResult of data) {
-      filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
-      await fetchWalmart(filteredTitle, id)
-      id++;
+    filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
+    await fetchWalmart(filteredTitle, id)
+    id++;
   }
 }
 
