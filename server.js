@@ -47,6 +47,8 @@ app.get("/api/walmart/:title", async (req, res) => {
                 })
               }
     })
+    
+    //--------------- Simple Grading Algorithm to find best match for our product ---------------------
     items.forEach(item => {  // Grading each item on search page
       searchTitleWordArray.forEach((searchTitleWord,i) => {
         if (item.walmartTitle.includes(searchTitleWord)) {
