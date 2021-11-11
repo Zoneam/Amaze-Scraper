@@ -6,7 +6,12 @@ const axios = require("axios");
 const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
 const app = express();
+const cors = require('cors');
+const corsOptions = {
+  exposedHeaders: 'Authorization',
+};
 
+app.use(cors(corsOptions));
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
@@ -33,7 +38,8 @@ app.get("/api/walmart/:title", async (req, res) => {
 
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
       timeout: 0,
-      waitUntil: 'domcontentloaded' 
+      waitUntil: 'domcontentloaded'
+      // waitUntil: 'networkidle0'
     });
     const html = await page.content();
     const $ = cheerio.load(html);
@@ -47,7 +53,7 @@ app.get("/api/walmart/:title", async (req, res) => {
                 })
               }
     })
-    
+
     //--------------- Simple Grading Algorithm to find best match for our product ---------------------
     items.forEach(item => {  // Grading each item on search page
       searchTitleWordArray.forEach((searchTitleWord,i) => {
