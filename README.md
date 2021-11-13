@@ -2,7 +2,7 @@
 
 If you get "At Walmart: undefined" on products, that means walmart CAPTCHA checker caught our bot! need to wait some time and retry.
 
-## THIS PROJECT IS FOR LEARNING PURPOSES ONLY!!!
+## -- THIS PROJECT IS FOR LEARNING PURPOSES ONLY!!! --
 
 # Puppeteer-heroku-buildpack
 
