@@ -156,7 +156,7 @@ app.get("/api/:searchInput", async (req, res) => { // our GET request for amazon
             couponAmount: couponAmount ? couponAmount : "",
           });
   });                                                          
-      productResults.length = 5;
+      productResults.length = 15;
      // Sending responce
       res.send(productResults); // Sending found products back
     } catch (err) {
