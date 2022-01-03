@@ -43,7 +43,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
       timeout: 0,
       waitUntil: 'domcontentloaded',
-      waitUntil: 'networkidle0'
+      // waitUntil: 'networkidle0'
     });
     const html = await page.content();
     const $ = cheerio.load(html);
@@ -156,7 +156,7 @@ app.get("/api/:searchInput", async (req, res) => { // our GET request for amazon
             couponAmount: couponAmount ? couponAmount : "",
           });
   });                                                          
-      productResults.length = 20;
+      productResults.length = 5;
      // Sending responce
       res.send(productResults); // Sending found products back
     } catch (err) {
