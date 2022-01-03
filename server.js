@@ -8,10 +8,14 @@ const puppeteer = require("puppeteer");
 const app = express();
 const cors = require('cors');
 const corsOptions = {
-  exposedHeaders: 'Authorization',
+  //exposedHeaders: 'Authorization',
+  origin: true,
+  optionsSuccessStatus: 200
+  
 };
 
-app.use(cors(corsOptions));
+app.use(cors());
+app.options('*', cors());
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
