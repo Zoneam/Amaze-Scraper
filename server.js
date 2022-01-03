@@ -42,8 +42,8 @@ app.get("/api/walmart/:title", async (req, res) => {
 
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
       timeout: 0,
-      waitUntil: 'domcontentloaded'
-      // waitUntil: 'networkidle0'
+      waitUntil: 'domcontentloaded',
+      waitUntil: 'networkidle0'
     });
     const html = await page.content();
     const $ = cheerio.load(html);
