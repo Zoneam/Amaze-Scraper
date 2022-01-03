@@ -9,13 +9,13 @@ const app = express();
 const cors = require('cors');
 const corsOptions = {
   //exposedHeaders: 'Authorization',
-  origin: true,
-  optionsSuccessStatus: 200
+  // origin: true,
+  // optionsSuccessStatus: 200
   
 };
 
 app.use(cors());
-app.options('*', cors());
+//app.options('*', cors());
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
