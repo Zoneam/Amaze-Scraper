@@ -9,3 +9,7 @@
 .spinner-border {
   margin-left: 1em;
 }
+
+.card {
+  border-radius: 2.25rem;
+}

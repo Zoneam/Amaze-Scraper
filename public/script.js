@@ -34,6 +34,7 @@ const drawCards = async (result) => {
           </div>
         </div>`;
   }
+
   $("#cards").html(card ? card : '<h2>No Search Results Yet!</h2>');
   await getWalmartPrice(result, ++calls); 
   localStorage.setItem('lastSearch', JSON.stringify(result));
@@ -61,6 +62,7 @@ async function fetchWalmart(filteredTitle, id) {
     }).then((response) => response.json())
       .then((result) => {
         if (result) {
+          console.log(result)
           document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
           document.getElementById(`${id}-walmart-price`).classList.replace('d-none', 'bg-success');
           document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
