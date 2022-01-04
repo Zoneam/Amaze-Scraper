@@ -7,24 +7,22 @@ const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
 const app = express();
 const cors = require('cors');
-const timeout = require('connect-timeout')
 const corsOptions = {
   //exposedHeaders: 'Authorization',
   // origin: true,
   // optionsSuccessStatus: 200
   
 };
-app.use(timeout('15s'))
+// app.use(timeout('15s'))
 // app.use(bodyParser())
-app.use(haltOnTimedout)
+// app.use(haltOnTimedout)
 
 app.use(cors());
-//app.options('*', cors());
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
 
-app.get("/api/walmart/:title", async (req, res) => {
+app.get("/api/walmart/:title",timeout('15s'), haltOnTimedout, async (req, res, next) => {
   let items = [];
   let searchItem = req.params.title;
   let searchTitleWordArray = searchItem.split(' '); // Braking our search title into array of words
