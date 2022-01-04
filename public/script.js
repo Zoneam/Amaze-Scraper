@@ -16,9 +16,12 @@ const drawCards = async (result) => {
       card += `<div class="col">
           <div class="card shadow-lg">
             <a href='${result[i].link}' target="_blank">
-             <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Price: $${result[i].priceWhole + result[i].priceFraction}</text>
+             <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+</a>
+             <rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Price: $${result[i].priceWhole + result[i].priceFraction}</text></rect>
+
              <a class="mt-4" id="${i}-walmart-link" href = '' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><div id="${i}-loading-spinner" class="spinner-border spinner-border-sm ml-0" role="status">
-           </div><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='d-none bg-gradient text-dark p-2 bg-opacity-50'></text></a>
+           </div><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='d-none bg-gradient text-dark p-2 bg-opacity-50'></text>
             </a>
             <div class="card-body">
             <a href='${result[i].link}' target="_blank">
