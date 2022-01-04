@@ -80,9 +80,10 @@ app.get("/api/walmart/:title", async (req, res) => {
     gradedItems.sort((a, b) => b.grade - a.grade); // Sorting Graded items by grade    
     await context.close();
 
-    if (Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length) < 65) { // checking if 65% words in title match
+    if (Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length) < 80) { // checking if 65% words in title match
       res.sendStatus(404) // Sending N/A back
     } else {
+      gradedItems[0].matchPercentage = Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length); 
       res.send(gradedItems[0]) // Sending back our hiest graded item
     }
 
