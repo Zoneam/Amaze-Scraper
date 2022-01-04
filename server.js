@@ -17,12 +17,14 @@ const corsOptions = {
 // app.use(bodyParser())
 // app.use(haltOnTimedout)
 
-app.use(cors());
+app.use(cors({
+  origin: "*",
+}));
 app.use(express.urlencoded({extended: true})); 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
 
-app.get("/api/walmart/:title",timeout('15s'), haltOnTimedout, async (req, res, next) => {
+app.get("/api/walmart/:title", async (req, res) => {
   let items = [];
   let searchItem = req.params.title;
   let searchTitleWordArray = searchItem.split(' '); // Braking our search title into array of words
@@ -166,11 +168,6 @@ app.get("/api/:searchInput", async (req, res) => { // our GET request for amazon
       res.send(err)
     }
 });
-
-
-function haltOnTimedout (req, res, next) {
-  if (!req.timedout) next()
-}
 
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
