@@ -7,12 +7,16 @@ const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
 const app = express();
 const cors = require('cors');
+const timeout = require('connect-timeout')
 const corsOptions = {
   //exposedHeaders: 'Authorization',
   // origin: true,
   // optionsSuccessStatus: 200
   
 };
+app.use(timeout('15s'))
+// app.use(bodyParser())
+app.use(haltOnTimedout)
 
 app.use(cors());
 //app.options('*', cors());
@@ -80,7 +84,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     gradedItems.sort((a, b) => b.grade - a.grade); // Sorting Graded items by grade    
     await context.close();
 
-    if (Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length) < 80) { // checking if 65% words in title match
+    if (Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length) < 80) { // checking if 80% words in title match
       res.sendStatus(404) // Sending N/A back
     } else {
       gradedItems[0].matchPercentage = Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length); 
@@ -164,6 +168,11 @@ app.get("/api/:searchInput", async (req, res) => { // our GET request for amazon
       res.send(err)
     }
 });
+
+
+function haltOnTimedout (req, res, next) {
+  if (!req.timedout) next()
+}
 
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
