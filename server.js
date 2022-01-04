@@ -45,7 +45,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     })
 
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
-      timeout: 20,
+      timeout: 0,
       waitUntil: 'domcontentloaded',
       // waitUntil: 'networkidle0'
     });
