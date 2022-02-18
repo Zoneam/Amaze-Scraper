@@ -88,7 +88,7 @@ app.get("/api/walmart/:title", async (req, res) => {
       res.sendStatus(404) // Sending N/A back
     } else {
       gradedItems[0].matchPercentage = Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length); 
-      res.send(gradedItems[0]) // Sending back our hiest graded item
+      res.send(gradedItems[0]) // Sending back our highest graded item
     }
 
     await browser.close();
