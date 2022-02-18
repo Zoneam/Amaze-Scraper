@@ -12,12 +12,10 @@ const corsOptions = {
   //exposedHeaders: 'Authorization',
   // origin: true,
   // optionsSuccessStatus: 200
-  
 };
 // app.use(timeout('15s'))
 // app.use(bodyParser())
 // app.use(haltOnTimedout)
-
 app.use(cors({
   origin: "*",
 }));
@@ -53,12 +51,10 @@ app.get("/api/walmart/:title", async (req, res) => {
       // waitUntil: 'networkidle0'
     });
     const html = await page.content();
-    const $ = cheerio.load(html);
-    // console.log(html)
-    
+    const $ = cheerio.load(html);    
     if ($('title', html).text() === 'Robot or human?') {
+      // Sending Bot Detected response
       res.sendStatus(204);
-      console.log("Bot Detected!")
       await context.close();
       await browser.close();
       return
@@ -106,7 +102,6 @@ app.get("/api/walmart/:title", async (req, res) => {
     await context.close();
     await browser.close();
   } catch (err) {
-    console.log("sending error " + err)
     res.send(err);
   }
 })
