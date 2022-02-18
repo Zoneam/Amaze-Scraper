@@ -7,6 +7,7 @@ const homeUrl = "https://www.amazon.com";
 const puppeteer = require("puppeteer");
 const app = express();
 const cors = require('cors');
+const { send } = require("process");
 const corsOptions = {
   //exposedHeaders: 'Authorization',
   // origin: true,
@@ -29,6 +30,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let searchItem = req.params.title;
   let searchTitleWordArray = searchItem.split(' '); // Braking our search title into array of words
   let gradedItems = [];
+  let headerVersion;
   try {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox']
@@ -36,8 +38,9 @@ app.get("/api/walmart/:title", async (req, res) => {
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
+    headerVersion = Math.floor(Math.random() * 100);
     await page.setExtraHTTPHeaders({  // Need to rotate headers to bypass CAPTCHA on walmart.com
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.132 Safari/537.36',
+      'user-agent': `Mozilla/5.0 (Windows NT ${headerVersion}.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.132 Safari/537.36`,
       'upgrade-insecure-requests': '1',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
       'accept-encoding': 'gzip, deflate, br',
@@ -51,6 +54,16 @@ app.get("/api/walmart/:title", async (req, res) => {
     });
     const html = await page.content();
     const $ = cheerio.load(html);
+    // console.log(html)
+    
+    if ($('title', html).text() === 'Robot or human?') {
+      res.sendStatus(204);
+      console.log("Bot Detected!")
+      await context.close();
+      await browser.close();
+      return
+    }
+
     $(".pa0-xl", html).each(function (i) { // finding each item on search page by class name
               if ($(this).find('span' + '.lh-title').text() !== '') {
                 items.push({
@@ -82,7 +95,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     })
     
     gradedItems.sort((a, b) => b.grade - a.grade); // Sorting Graded items by grade    
-    await context.close();
+    
 
     if (Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length) < 80) { // checking if 80% words in title match
       res.sendStatus(404) // Sending N/A back
@@ -90,9 +103,10 @@ app.get("/api/walmart/:title", async (req, res) => {
       gradedItems[0].matchPercentage = Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length); 
       res.send(gradedItems[0]) // Sending back our highest graded item
     }
-
+    await context.close();
     await browser.close();
   } catch (err) {
+    console.log("sending error " + err)
     res.send(err);
   }
 })
