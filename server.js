@@ -23,6 +23,14 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
 
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+}
+
 app.get("/api/walmart/:title", async (req, res) => {
   let items = [];
   let searchItem = req.params.title;
@@ -36,7 +44,7 @@ app.get("/api/walmart/:title", async (req, res) => {
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
-    headerVersion = Math.floor(Math.random() * 100);
+    headerVersion = Math.floor(Math.random() * 1000);
     await page.setExtraHTTPHeaders({  // Need to rotate headers to bypass CAPTCHA on walmart.com
       'user-agent': `Mozilla/5.0 (Windows NT ${headerVersion}.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.132 Safari/537.36`,
       'upgrade-insecure-requests': '1',
@@ -57,7 +65,8 @@ app.get("/api/walmart/:title", async (req, res) => {
       res.sendStatus(204);
       await context.close();
       await browser.close();
-      return
+      sleep(2000);
+      return;
     }
 
     $(".pa0-xl", html).each(function (i) { // finding each item on search page by class name
