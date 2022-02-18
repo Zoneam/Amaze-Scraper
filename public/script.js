@@ -52,6 +52,7 @@ const drawCards = async (result) => {
     filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
     await fetchWalmart(filteredTitle, id)
     id++;
+    console.log("id in get walmart price " + id);
   }
 }
 
@@ -64,15 +65,18 @@ async function fetchWalmart(filteredTitle, id) {
       },
     }).then((response) => response.json())
       .then((result) => {
+        console.log(response.status);
         if (result) {
           console.log(result)
           document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
           document.getElementById(`${id}-walmart-price`).classList.replace('d-none', 'bg-success');
           document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
           document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
-    }
+    } 
     })
+    console.log("fetching walmart " + id);
   } catch (err) {
+    console.log("error")
     document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
     document.getElementById(`${id}-walmart-price`).classList.replace('d-none','bg-danger');
     document.getElementById(`${id}-walmart-price`).innerHTML = "Not Available At Walmart";

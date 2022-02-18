@@ -8,10 +8,9 @@ const puppeteer = require("puppeteer");
 const app = express();
 const cors = require('cors');
 const corsOptions = {
-  //exposedHeaders: 'Authorization',
+  // exposedHeaders: 'Authorization',
   // origin: true,
   // optionsSuccessStatus: 200
-  
 };
 // app.use(timeout('15s'))
 // app.use(bodyParser())
@@ -30,6 +29,7 @@ app.get("/api/walmart/:title", async (req, res) => {
   let searchTitleWordArray = searchItem.split(' '); // Braking our search title into array of words
   let gradedItems = [];
   try {
+    console.log("Launch");
     const browser = await puppeteer.launch({
       args: ['--no-sandbox']
     }); // needs to be headless on heroku
@@ -43,14 +43,17 @@ app.get("/api/walmart/:title", async (req, res) => {
       'accept-encoding': 'gzip, deflate, br',
       'accept-language': 'en-US,en;q=0.9,en;q=0.8'
     })
-
+    console.log("headers set going to walmart")
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
       timeout: 0,
       waitUntil: 'domcontentloaded',
       // waitUntil: 'networkidle0'
     });
+    console.log("Loading page")
     const html = await page.content();
     const $ = cheerio.load(html);
+    console.log("page loaded")
+    // console.log(html)
     $(".pa0-xl", html).each(function (i) { // finding each item on search page by class name
               if ($(this).find('span' + '.lh-title').text() !== '') {
                 items.push({
@@ -61,8 +64,9 @@ app.get("/api/walmart/:title", async (req, res) => {
                 })
               }
     })
-
+console.log(items)
     //--------------- Simple Grading Algorithm to find best match for our product ---------------------
+    if (items.length){
     items.forEach(item => {  // Grading each item on search page
       searchTitleWordArray.forEach((searchTitleWord,i) => {
         if (item.walmartTitle.includes(searchTitleWord)) {
@@ -80,9 +84,8 @@ app.get("/api/walmart/:title", async (req, res) => {
       })
       gradedItems.push(item);
     })
-    
+  
     gradedItems.sort((a, b) => b.grade - a.grade); // Sorting Graded items by grade    
-    await context.close();
 
     if (Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length) < 80) { // checking if 80% words in title match
       res.sendStatus(404) // Sending N/A back
@@ -90,8 +93,13 @@ app.get("/api/walmart/:title", async (req, res) => {
       gradedItems[0].matchPercentage = Math.floor(gradedItems[0].grade * 100 / searchTitleWordArray.length); 
       res.send(gradedItems[0]) // Sending back our highest graded item
     }
-
+  }else {
+    res.sendStatus(204)
+  }
+  
+    await context.close();
     await browser.close();
+    
   } catch (err) {
     res.send(err);
   }
