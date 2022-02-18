@@ -65,7 +65,7 @@ app.get("/api/walmart/:title", async (req, res) => {
       res.sendStatus(204);
       await context.close();
       await browser.close();
-      sleep(2000);
+      sleep(5000);
       return;
     }
 
