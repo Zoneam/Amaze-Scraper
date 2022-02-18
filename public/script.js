@@ -52,30 +52,41 @@ const drawCards = async (result) => {
     filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
     await fetchWalmart(filteredTitle, id)
     id++;
+    console.log("id in get walmart price " + id);
   }
 }
 
 async function fetchWalmart(filteredTitle, id) {
   try {
-    await fetch(`/api/walmart/${filteredTitle}`, {
+    const response = await fetch(`/api/walmart/${filteredTitle}`, {
       method: "GET",
       headers: {
         Accept: "application/json"
       },
-    }).then((response) => response.json())
-      .then((result) => {
+    })
+
+    if (response.status === 204) {
+      document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
+      document.getElementById(`${id}-walmart-price`).classList.replace('d-none','bg-danger');
+      document.getElementById(`${id}-walmart-price`).innerHTML = "Detected as Bot!";
+    } else {
+      if (response.status === 200) {
+        const result = await (response.json());
         if (result) {
-          console.log(result)
           document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
           document.getElementById(`${id}-walmart-price`).classList.replace('d-none', 'bg-success');
           document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
           document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
+        }
+      } else
+        if (response.status === 404) {
+          document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
+          document.getElementById(`${id}-walmart-price`).classList.replace('d-none','bg-dark');
+          document.getElementById(`${id}-walmart-price`).innerHTML = "Not Available At Walmart";
+        }
     }
-    })
   } catch (err) {
-    document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
-    document.getElementById(`${id}-walmart-price`).classList.replace('d-none','bg-danger');
-    document.getElementById(`${id}-walmart-price`).innerHTML = "Not Available At Walmart";
+    console.log("error", err);
   }
 }
 
