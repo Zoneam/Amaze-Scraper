@@ -52,7 +52,7 @@ app.get("/api/walmart/:title", async (req, res) => {
       'accept-encoding': 'gzip, deflate, br',
       'accept-language': 'en-US,en;q=0.9,en;q=0.8'
     })
-    console.log(headerVersion);
+
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
       timeout: 0,
       waitUntil: 'domcontentloaded',
@@ -66,8 +66,6 @@ app.get("/api/walmart/:title", async (req, res) => {
       await context.close();
       await browser.close();
       sleep(5000);
-      console.log("sleep");
-      
       return;
     }
 
@@ -75,7 +73,7 @@ app.get("/api/walmart/:title", async (req, res) => {
               if ($(this).find('span' + '.lh-title').text() !== '') {
                 items.push({
                   walmartTitle: $(this).find('span' + '.lh-title').text().replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ').split(' '),
-                  walmartPrice: $(this).children().find('div' + '.mr2-xl').text()?$(this).children().find('div' + '.mr2-xl').text():$(this).children().find('div' + '.lh-copy').text().replace(/[^0-9.]/g,''),
+                  walmartPrice: $(this).children().find('div' + '.mr2-xl').text()?$(this).children().find('div' + '.mr2-xl').text():$(this).children().find('div' + '.lh-copy').text(),
                   walmartLink: ($(this).children().find('a' + '.z-1').attr('href').substring(0, 4) === 'http') ? $(this).children().find('a' + '.z-1').attr('href') : 'https://www.walmart.com' + $(this).children().find('a' + '.z-1').attr('href'),
                   grade: 0,
                 })
