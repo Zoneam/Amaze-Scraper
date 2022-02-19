@@ -17,7 +17,22 @@ padding: 35px 35px 5px 35px;
 }
 
 .card-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: contents;
+}
+
+.card-text {
+  margin:5px;
+}
+
+.price_display {
+  position: relative;
+  align-self: flex-start;
+}
+
+.price-rect {
+  border-radius: 0px 15px 15px 0px;
+}
+
+.savings {
+  margin-bottom: 5px;
 }
