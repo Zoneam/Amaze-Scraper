@@ -27,6 +27,7 @@ padding: 35px 35px 5px 35px;
 .price_display {
   position: relative;
   align-self: flex-start;
+  margin-bottom: 22px;
 }
 
 .price-rect {
