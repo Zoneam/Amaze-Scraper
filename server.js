@@ -46,12 +46,13 @@ app.get("/api/walmart/:title", async (req, res) => {
     page.setDefaultNavigationTimeout(0); // need to set timout to get prices faster
     headerVersion = Math.floor(Math.random() * 1000);
     await page.setExtraHTTPHeaders({  // Need to rotate headers to bypass CAPTCHA on walmart.com
-      'user-agent': `Mozilla/5.0 (Windows NT ${headerVersion}.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.${headerVersion} Safari/537.36`,
+      'user-agent': `Mozilla/5.0 (Windows NT ${headerVersion}.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.132 Safari/537.36`,
       'upgrade-insecure-requests': '1',
       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
       'accept-encoding': 'gzip, deflate, br',
       'accept-language': 'en-US,en;q=0.9,en;q=0.8'
     })
+    console.log(headerVersion);
     await page.goto(`https://www.walmart.com/search?q=${searchItem}`, { 
       timeout: 0,
       waitUntil: 'domcontentloaded',
@@ -65,6 +66,8 @@ app.get("/api/walmart/:title", async (req, res) => {
       await context.close();
       await browser.close();
       sleep(5000);
+      console.log("sleep");
+      
       return;
     }
 
