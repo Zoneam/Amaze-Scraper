@@ -26,7 +26,6 @@ const drawCards = async (result) => {
             <a href='${result[i].link}' target="_blank">
               <p class="card-text" id="title_${i}">${result[i].title.length > 55 ? (result[i].title.substring(0, 55) + '...'):result[i].title}</p>
             </a>
-
               <div class="d-flex justify-content-between align-items-center flex-column mt-2">
                 ${result[i].couponAmount ? `<large class="bg-success text-white p-2 bg-opacity-75 mt-2 rounded">${result[i].couponAmount}</large>` : ''}
               </div>
@@ -70,7 +69,7 @@ async function fetchWalmart(filteredTitle, id) {
         const result = await (response.json());
         if (result) {
           document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
-          document.getElementById(`${id}-walmart-price`).classList.replace('d-none bg-dark bg-danger', 'bg-success');
+          document.getElementById(`${id}-walmart-price`).classList.replace('d-none', 'bg-success');
           document.getElementById(`${id}-walmart-price`).innerHTML = "Walmart Price: " + result.walmartPrice;
           document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
         }
