@@ -4,6 +4,7 @@ let calls = 0;
 searchButton.addEventListener("click", async (e) => {
   e.preventDefault();
   const searchInput = document.getElementById("searchInput").value.trim();
+  document.getElementById("searchInput").value = '';
   result = await axios(`/api/${searchInput}`)
   $(document).ready(async function () {
         drawCards(result.data);
@@ -16,23 +17,20 @@ const drawCards = async (result) => {
       card += `<div class="col">
           <div class="card shadow-lg">
             <a href='${result[i].link}' target="_blank">
-             <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
-</a>
-             <rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Price: $${result[i].priceWhole + result[i].priceFraction}</text></rect>
-
+             <img class="bd-placeholder-img card-img-top" width="100%" src="${result[i].img}" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"></a>
+             <a class="mt-4" href = '${result[i].link}' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='price' class='bg-warning bg-gradient text-dark p-2 bg-opacity-75'>Amazon Price: $${result[i].priceWhole + result[i].priceFraction}</text></rect></a>
              <a class="mt-4" id="${i}-walmart-link" href = '' target="_blank"><rect width="100%" height="100%" fill="#55595c"/><div id="${i}-loading-spinner" class="spinner-border spinner-border-sm ml-0" role="status">
            </div><text x="50%" y="50%" fill="#eceeef" dy=".3em" id='${i}-walmart-price' class='d-none bg-gradient text-dark p-2 bg-opacity-50'></text>
             </a>
             <div class="card-body">
             <a href='${result[i].link}' target="_blank">
-              <p class="card-text" id="title_${i}">${result[i].title}</p>
+              <p class="card-text" id="title_${i}">${result[i].title.length > 55 ? (result[i].title.substring(0, 55) + '...'):result[i].title}</p>
             </a>
+
               <div class="d-flex justify-content-between align-items-center flex-column mt-2">
-                <div class="btn-group">
-                  <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.open('${result[i].link}','_blank')">Buy Now</button>
-                </div>
                 ${result[i].couponAmount ? `<large class="bg-success text-white p-2 bg-opacity-75 mt-2 rounded">${result[i].couponAmount}</large>` : ''}
               </div>
+
             </div>
           </div>
         </div>`;
@@ -72,8 +70,8 @@ async function fetchWalmart(filteredTitle, id) {
         const result = await (response.json());
         if (result) {
           document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
-          document.getElementById(`${id}-walmart-price`).classList.replace('d-none', 'bg-success');
-          document.getElementById(`${id}-walmart-price`).innerHTML = "At Walmart: " + result.walmartPrice;
+          document.getElementById(`${id}-walmart-price`).classList.replace('d-none bg-dark bg-danger', 'bg-success');
+          document.getElementById(`${id}-walmart-price`).innerHTML = "Walmart Price: " + result.walmartPrice;
           document.getElementById(`${id}-walmart-link`).href = result.walmartLink;
         }
       } else

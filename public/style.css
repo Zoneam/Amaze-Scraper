@@ -1,5 +1,5 @@
 .card-img-top{
-  padding: 35px;
+padding: 35px 35px 5px 35px;
 }
 
 #price{
@@ -13,6 +13,7 @@
 .card {
   border-radius: 2.25rem;
   height: 100%;
+  align-items: center; 
 }
 
 .card-body {
