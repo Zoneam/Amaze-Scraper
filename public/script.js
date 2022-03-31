@@ -12,6 +12,7 @@ searchButton.addEventListener("click", async (e) => {
     });
 
 const drawCards = async (result) => {
+  
   let card = "";
   for (let i = 0; i < result.length; i++) {
       card += `<div class="col">
@@ -45,15 +46,17 @@ const drawCards = async (result) => {
  async function getWalmartPrice(data, callId) {  // need to terminate this function to stop previous search 
   let filteredTitle = '';
   let id = 0;
-  for (singleResult of data) {
+   
+   for (singleResult of data) {
     if (callId !== calls) break;  // if call id changes brakes from previous for loop
     filteredTitle = singleResult.title.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s{2,}/g, ' ');
-    await fetchWalmart(filteredTitle, id)
+     await fetchWalmart(filteredTitle, id);
     id++;
   }
 }
 
 async function fetchWalmart(filteredTitle, id) {
+  console.log('filteredTitle is :' ,filteredTitle);
   try {
     const response = await fetch(`/api/walmart/${filteredTitle}`, {
       method: "GET",
@@ -61,7 +64,7 @@ async function fetchWalmart(filteredTitle, id) {
         Accept: "application/json"
       },
     })
-
+    console.log('response :' , response);
     if (response.status === 204) {
       document.getElementById(`${id}-loading-spinner`).classList.add('d-none');
       document.getElementById(`${id}-walmart-price`).classList.replace('d-none','bg-danger');

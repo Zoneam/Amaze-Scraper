@@ -143,7 +143,7 @@ app.get("/api/:searchInput", async (req, res) => { // our GET request for amazon
     let $ = cheerio.load(body); // Loading response from page to cheerio
 
     $(".s-asin", response.data).each(function (i) { // Finding products by Class name on search page
-          // Finding Coupon 
+          // Looking if Coupon Available
           isCouponAvailable = false;
           if ($(this).find('span' + '.s-coupon-highlight-color').text() !== '') { // Looking for coupon if available
             couponAmount = $(this).find('.s-coupon-highlight-color').text()
