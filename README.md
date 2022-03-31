@@ -1,4 +1,4 @@
-## _[Deployed - Amaze Scrape](https://amaze-scrape.herokuapp.com/)_
+## _[Deployed - Amaze-Scrape](https://amaze-scrape.herokuapp.com/)_
 
 If you get "At Walmart: undefined" on products, that means walmart CAPTCHA checker caught our bot! need to wait some time and retry.
 
